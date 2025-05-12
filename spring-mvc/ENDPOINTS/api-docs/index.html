@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Banco Agrícola - Documentación</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="/placeholder.svg?height=60&width=60&query=bank%20logo" alt="Logo Banco Agrícola">
+                <h1>API Banco Agrícola</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#clientes">Clientes</a></li>
+                    <li><a href="#cuentas">Cuentas</a></li>
+                    <li><a href="#prestamos">Préstamos</a></li>
+                    <li><a href="#movimientos">Movimientos</a></li>
+                    <li><a href="#transacciones">Transacciones</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <h2>Documentación de la API</h2>
+            <p>Esta documentación describe los endpoints disponibles en la API del Banco Agrícola, permitiendo la gestión de clientes, cuentas, préstamos, movimientos y transacciones bancarias.</p>
+        </section>
+
+        <section id="home" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-home"></i> Home Controller</h2>
+                <p>Endpoints básicos para información general y estado de la API</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Página de inicio</h3>
+                    <p>Página de inicio con información general de la API</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Información general de la API y lista de endpoints disponibles</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/health</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Estado de la API</h3>
+                    <p>Verificar el estado de la API</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Estado actual de la API y timestamp</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="clientes" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Cliente Controller</h2>
+                <p>Gestión de clientes del banco</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/clientes</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener todos los clientes</h3>
+                    <p>Recupera la lista completa de clientes registrados</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de todos los clientes registrados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/clientes/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener un cliente por ID</h3>
+                    <p>Recupera los datos de un cliente específico por su ID</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del cliente</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del cliente solicitado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/clientes/dui/{dui}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener un cliente por DUI</h3>
+                    <p>Recupera los datos de un cliente específico por su número de DUI</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>dui</code> - Número de DUI del cliente</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del cliente con el DUI especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/clientes</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Crear un nuevo cliente</h3>
+                    <p>Registra un nuevo cliente en el sistema</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos del cliente a crear</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del cliente creado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/clientes/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Actualizar un cliente</h3>
+                    <p>Actualiza los datos de un cliente existente</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del cliente a actualizar</p>
+                    </div>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos actualizados del cliente</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del cliente actualizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/clientes/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Eliminar un cliente</h3>
+                    <p>Elimina un cliente del sistema</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del cliente a eliminar</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Sin contenido (204) si se eliminó correctamente</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cuentas" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-piggy-bank"></i> Cuenta Controller</h2>
+                <p>Gestión de cuentas bancarias</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/cuentas</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener todas las cuentas</h3>
+                    <p>Recupera la lista completa de cuentas registradas</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de todas las cuentas registradas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/cuentas/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener una cuenta por ID</h3>
+                    <p>Recupera los datos de una cuenta específica por su ID</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID de la cuenta</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la cuenta solicitada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/cuentas/numero/{numeroCuenta}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener una cuenta por número</h3>
+                    <p>Recupera los datos de una cuenta específica por su número</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>numeroCuenta</code> - Número de la cuenta</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la cuenta con el número especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/cuentas/cliente/{idCliente}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener cuentas de un cliente</h3>
+                    <p>Recupera todas las cuentas asociadas a un cliente específico</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>idCliente</code> - ID del cliente</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de cuentas del cliente especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/cuentas</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Crear una nueva cuenta</h3>
+                    <p>Registra una nueva cuenta en el sistema</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos de la cuenta a crear</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la cuenta creada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/cuentas/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Actualizar una cuenta</h3>
+                    <p>Actualiza los datos de una cuenta existente</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID de la cuenta a actualizar</p>
+                    </div>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos actualizados de la cuenta</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la cuenta actualizada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/cuentas/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Eliminar una cuenta</h3>
+                    <p>Elimina una cuenta del sistema</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID de la cuenta a eliminar</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Sin contenido (204) si se eliminó correctamente</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="prestamos" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-hand-holding-usd"></i> Préstamo Controller</h2>
+                <p>Gestión de préstamos bancarios</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/prestamos</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener todos los préstamos</h3>
+                    <p>Recupera la lista completa de préstamos registrados</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de todos los préstamos registrados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/prestamos/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener un préstamo por ID</h3>
+                    <p>Recupera los datos de un préstamo específico por su ID</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del préstamo</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del préstamo solicitado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/prestamos/cliente/{idCliente}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener préstamos de un cliente</h3>
+                    <p>Recupera todos los préstamos asociados a un cliente específico</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>idCliente</code> - ID del cliente</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de préstamos del cliente especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/prestamos/cajero/{idCajero}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener préstamos por cajero</h3>
+                    <p>Recupera todos los préstamos gestionados por un cajero específico</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>idCajero</code> - ID del cajero (empleado)</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de préstamos gestionados por el cajero especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/prestamos/estado/{estado}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener préstamos por estado</h3>
+                    <p>Recupera todos los préstamos con un estado específico</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>estado</code> - Estado del préstamo (SOLICITADO, APROBADO, RECHAZADO, etc.)</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de préstamos con el estado especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/prestamos</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Crear un nuevo préstamo</h3>
+                    <p>Registra un nuevo préstamo en el sistema</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos del préstamo a crear</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del préstamo creado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/prestamos/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Actualizar un préstamo</h3>
+                    <p>Actualiza los datos de un préstamo existente</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del préstamo a actualizar</p>
+                    </div>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p>Datos actualizados del préstamo</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del préstamo actualizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/prestamos/{id}/estado</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Cambiar estado de un préstamo</h3>
+                    <p>Actualiza el estado de un préstamo existente</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del préstamo</p>
+                    </div>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"estado": "NUEVO_ESTADO"}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del préstamo con el estado actualizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/prestamos/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Eliminar un préstamo</h3>
+                    <p>Elimina un préstamo del sistema</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del préstamo a eliminar</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Sin contenido (204) si se eliminó correctamente</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="movimientos" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-exchange-alt"></i> Movimiento Controller</h2>
+                <p>Gestión de movimientos bancarios</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/movimientos</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener todos los movimientos</h3>
+                    <p>Recupera la lista completa de movimientos registrados</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de todos los movimientos registrados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/movimientos/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener un movimiento por ID</h3>
+                    <p>Recupera los datos de un movimiento específico por su ID</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID del movimiento</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del movimiento solicitado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/movimientos/cuenta/{idCuenta}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener movimientos de una cuenta</h3>
+                    <p>Recupera todos los movimientos asociados a una cuenta específica</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>idCuenta</code> - ID de la cuenta</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de movimientos de la cuenta especificada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/movimientos/fechas</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener movimientos por fechas</h3>
+                    <p>Recupera todos los movimientos entre fechas específicas</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>fechaInicio</code> - Fecha de inicio (yyyy-MM-dd)</p>
+                        <p><code>fechaFin</code> - Fecha de fin (yyyy-MM-dd)</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de movimientos entre las fechas especificadas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/movimientos/tipo/{tipoMovimiento}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener movimientos por tipo</h3>
+                    <p>Recupera todos los movimientos de un tipo específico</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>tipoMovimiento</code> - Tipo de movimiento (DEPOSITO, RETIRO, TRANSFER)</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de movimientos del tipo especificado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/movimientos/deposito</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar un depósito</h3>
+                    <p>Registra un nuevo depósito en una cuenta</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"idCuenta": número, "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del movimiento de depósito realizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/movimientos/retiro</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar un retiro</h3>
+                    <p>Registra un nuevo retiro de una cuenta</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"idCuenta": número, "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del movimiento de retiro realizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/movimientos/transferencia</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar una transferencia</h3>
+                    <p>Registra una nueva transferencia entre cuentas</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"idCuentaOrigen": número, "idCuentaDestino": número, "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos del movimiento de transferencia realizado</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="transacciones" class="endpoint-section">
+            <div class="section-header">
+                <h2><i class="fas fa-money-bill-wave"></i> Transacción Controller</h2>
+                <p>Gestión de transacciones bancarias</p>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/transacciones</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener todas las transacciones</h3>
+                    <p>Recupera la lista completa de transacciones registradas</p>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de todas las transacciones registradas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/transacciones/{id}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener una transacción por ID</h3>
+                    <p>Recupera los datos de una transacción específica por su ID</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>id</code> - ID de la transacción</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la transacción solicitada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/transacciones/cuenta/{numeroCuenta}</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Obtener transacciones de una cuenta</h3>
+                    <p>Recupera todas las transacciones asociadas a una cuenta específica por su número</p>
+                    <div class="params">
+                        <h4>Parámetros</h4>
+                        <p><code>numeroCuenta</code> - Número de la cuenta</p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Lista de transacciones de la cuenta especificada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/transacciones/deposito</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar un depósito</h3>
+                    <p>Registra un nuevo depósito usando el número de cuenta</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"numeroCuenta": "string", "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la transacción de depósito realizada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/transacciones/retiro</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar un retiro</h3>
+                    <p>Registra un nuevo retiro usando el número de cuenta</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"numeroCuenta": "string", "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la transacción de retiro realizada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/transacciones/transferencia</span>
+                </div>
+                <div class="endpoint-content">
+                    <h3>Realizar una transferencia</h3>
+                    <p>Registra una nueva transferencia entre cuentas usando números de cuenta</p>
+                    <div class="body">
+                        <h4>Body</h4>
+                        <p><code>{"numeroCuentaOrigen": "string", "numeroCuentaDestino": "string", "monto": número}</code></p>
+                    </div>
+                    <div class="response">
+                        <h4>Respuesta</h4>
+                        <p>Datos de la transacción de transferencia realizada</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Banco Agrícola - API Documentation</p>
+            <div class="footer-links">
+                <a href="#home">Inicio</a>
+                <a href="#clientes">Clientes</a>
+                <a href="#cuentas">Cuentas</a>
+                <a href="#prestamos">Préstamos</a>
+                <a href="#movimientos">Movimientos</a>
+                <a href="#transacciones">Transacciones</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
