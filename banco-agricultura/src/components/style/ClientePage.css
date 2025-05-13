@@ -1,0 +1,133 @@
+.cliente-container {
+  min-height: 100vh;
+  background-color: #f0fdf4;
+}
+
+.cliente-header {
+  background-color: #40916c;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cliente-logo-container {
+  width: 4rem;
+  height: 4rem;
+}
+
+.cliente-logo {
+  width: 247%;
+  height: 98%;
+  object-fit: cover;
+}
+
+.cliente-avatar-button {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background-color: #6c757d;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.cliente-avatar-image {
+  width: 100%;
+  height: 125%;
+  object-fit: cover;
+}
+
+.cliente-main {
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.cliente-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.cliente-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.cliente-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.cliente-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 16rem;
+  object-fit: contain;
+}
+
+.cliente-info-container {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cliente-info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.cliente-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cliente-info-item {
+  display: flex;
+  align-items: flex-start;
+  color: #1b4332;
+}
+
+.cliente-button-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.cliente-continue-button {
+  background-color: #40916c;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cliente-continue-button:hover {
+  background-color: #1b4332;
+}
+
+@media (min-width: 768px) {
+  .cliente-content {
+    flex-direction: row;
+  }
+
+  .cliente-image-container {
+    flex: 1;
+  }
+
+  .cliente-info-container {
+    flex: 2;
+  }
+}
