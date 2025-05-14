@@ -1,9 +1,10 @@
-.dashboard-container {
+/* Estilos generales */
+.gerentePerfilDashboardContainer {
   min-height: 100vh;
   background-color: #f3f4f6;
 }
 
-.dashboard-header {
+.gerentePerfilDashboardHeader {
   background-color: #4da150;
   padding: 1rem 2rem;
   display: flex;
@@ -11,28 +12,29 @@
   justify-content: space-between;
 }
 
-.dashboard-logo-container {
+.gerentePerfilLogoContainer {
   width: 4rem;
   height: 4rem;
 }
 
-.dashboard-logo {
+.gerentePerfilLogo {
   width: 247%;
   height: 98%;
   object-fit: cover;
 }
 
-.dashboard-title {
+.gerentePerfilDashboardTitle {
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
 }
 
-.user-menu {
+/* Menú de usuario */
+.gerentePerfilUserMenu {
   position: relative;
 }
 
-.user-avatar {
+.gerentePerfilAvatar {
   width: 5rem;
   height: 5rem;
   border-radius: 99px;
@@ -43,13 +45,13 @@
   padding: 0;
 }
 
-.avatar-image {
+.gerentePerfilAvatarImage {
   width: 100%;
   height: 125%;
   object-fit: cover;
 }
 
-.menu-dropdown {
+.gerentePerfilMenuDropdown {
   position: absolute;
   right: 0;
   background-color: white;
@@ -61,7 +63,7 @@
   z-index: 1000;
 }
 
-.menu-item {
+.gerentePerfilMenuItem {
   background: none;
   border: none;
   padding: 0.5rem 1rem;
@@ -69,82 +71,79 @@
   text-align: left;
 }
 
-.menu-item:hover {
+.gerentePerfilMenuItem:hover {
   background-color: #f0f0f0;
 }
 
-.dashboard-main {
+/* Estilos principales del contenido */
+.gerentePerfilDashboardMain {
   padding: 1.5rem;
   max-width: 72rem;
   margin: 0 auto;
 }
 
-.action-panel {
+.gerentePerfilContentContainer {
   background-color: white;
   border-radius: 10px;
   padding: 2rem;
-  margin-bottom: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.gerentePerfilTitle {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
-.action-image {
-  max-width: 100%;
-  height: auto;
-  max-height: 8rem;
-  object-fit: contain;
-}
-
-.action-text {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 1rem;
-}
-
-.options-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.option-button {
+.gerentePerfilInfo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background-color: #f8f9fa;
-  border: none;
-  border-radius: 10px;
-  padding: 1rem;
-  cursor: pointer;
-  flex: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 1rem;
 }
 
-.option-icon {
-  width: 3rem;
-  height: 3rem;
+.gerentePerfilImageContainer {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.gerentePerfilUserImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gerentePerfilDetails {
+  width: 100%;
+  text-align: left;
+}
+
+.gerentePerfilDetailItem {
+  font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
-.return-button-container {
+.gerentePerfilButtonContainer {
   display: flex;
-  justify-content: center;
-  margin-top: 2rem;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
 
-.return-button {
+.gerentePerfilEditButton, .gerentePerfilReturnButton {
   background-color: #4da150;
   color: white;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.return-button:hover {
+.gerentePerfilEditButton:hover, .gerentePerfilReturnButton:hover {
   background-color: #3d8741;
 }

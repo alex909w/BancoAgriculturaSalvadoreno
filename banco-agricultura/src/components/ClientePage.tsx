@@ -1,51 +1,67 @@
 "use client"
 
-import type React from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./style/ClientePage.css"
 
 const ClientePage: React.FC = () => {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = () => {
     navigate("/login")
   }
 
+  const handleToggleMenu = () => {
+    setMenuOpen(!menuOpen)
+  }
+
   return (
-    <div className="cliente-container">
-      <header className="cliente-header">
-        <div className="cliente-logo-container">
-          <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="cliente-logo" />
+    <div className="welcome-container">
+      <header className="welcome-header">
+        <div className="welcome-logo-container">
+          <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="welcome-logo" />
         </div>
-        <button className="cliente-avatar-button" onClick={handleLogout}>
-          <img src="/assets/Usuario.png" alt="Cliente" className="cliente-avatar-image" />
-        </button>
+
+        {/* Avatar con menú desplegable */}
+        <div className="user-menu">
+          <button className="user-avatar" onClick={handleToggleMenu}>
+            <img src="/assets/Usuario.png" alt="Cliente" className="avatar-image" />
+          </button>
+          {menuOpen && (
+            <div className="menu-dropdown">
+              <button className="menu-item" onClick={() => navigate("/perfil-cliente")}>Perfil</button>
+              <button className="menu-item" onClick={() => navigate("/configuracion-cliente")}>Configuración</button>
+              <button className="menu-item" onClick={handleLogout}>Cerrar Sesión</button>
+            </div>
+          )}
+        </div>
       </header>
 
-      <main className="cliente-main">
-        <h1 className="cliente-title">Bienvenido, estimado cliente</h1>
+      <main className="welcome-main">
+        <h1 className="welcome-title">Bienvenido, estimado cliente</h1>
 
-        <div className="cliente-content">
-          <div className="cliente-image-container">
-            <img src="/assets/customer-service.png" alt="Atención al cliente" className="cliente-image" />
+        <div className="welcome-content">
+          <div className="service-image-container">
+            <img src="/assets/customer-service.png" alt="Atención al cliente" className="service-image" />
           </div>
 
-          <div className="cliente-info-container">
-            <h2 className="cliente-info-title">En AgroBanco Salvadoreño, ofrecemos soluciones financieras diseñadas para el sector agrícola.
+          <div className="reminders-container">
+            <h2 className="reminders-title">En AgroBanco Salvadoreño, ofrecemos soluciones financieras diseñadas para el sector agrícola.
               Nuestra plataforma te permite:</h2>
-            <ul className="cliente-info-list">
-              <li className="cliente-info-item">✓ Solicitar créditos agrícolas para financiar cultivos, maquinaria y crecimiento de tu negocio.</li>
-              <li className="cliente-info-item">✓ Abrir y administrar cuentas diseñadas para productores y emprendedores del campo.</li>
-              <li className="cliente-info-item">✓ Realizar transferencias y pagos de forma rápida y segura.</li>
-              <li className="cliente-info-item">✓ Consultar estados de cuenta y gestionar tus finanzas en cualquier momento.</li>
-              <li className="cliente-info-item">✓ Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</li>
-              <h2 className="cliente-info-title">Crecemos contigo y con el campo. ¡Impulsa tu producción con nosotros!</h2>
+            <ul className="reminders-list">
+              <li className="reminder-item"><span className="check-mark">✓</span> Solicitar créditos agrícolas para financiar cultivos, maquinaria y crecimiento de tu negocio.</li>
+              <li className="reminder-item"><span className="check-mark">✓</span> Abrir y administrar cuentas diseñadas para productores y emprendedores del campo.</li>
+              <li className="reminder-item"><span className="check-mark">✓</span> Realizar transferencias y pagos de forma rápida y segura.</li>
+              <li className="reminder-item"><span className="check-mark">✓</span> Consultar estados de cuenta y gestionar tus finanzas en cualquier momento.</li>
+              <li className="reminder-item"><span className="check-mark">✓</span> Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</li>
             </ul>
+            <h2 className="reminders-title">Crecemos contigo y con el campo. ¡Impulsa tu producción con nosotros!</h2>
           </div>
         </div>
 
-        <div className="cliente-button-container">
-          <button className="cliente-continue-button" onClick={() => navigate("/cliente-dashboard")}>
+        <div className="button-container">
+          <button className="continue-button" onClick={() => navigate("/dashboard-cliente")}>
             Continuar
           </button>
         </div>

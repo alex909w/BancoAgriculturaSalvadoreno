@@ -1,14 +1,23 @@
 "use client"
 
-import type React from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./style/CajeroPage.css"
 
 const CajeroPage: React.FC = () => {
   const navigate = useNavigate()
+  const [menuVisible, setMenuVisible] = useState(false)
 
   const handleLogout = () => {
     navigate("/login")
+  }
+
+  const handleGoBack = () => {
+    navigate("/cliente-page") // Asegúrate de que esta ruta esté configurada en tu aplicación
+  }
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
   }
 
   return (
@@ -17,9 +26,18 @@ const CajeroPage: React.FC = () => {
         <div className="welcome-logo-container">
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="welcome-logo" />
         </div>
-        <button className="user-avatar" onClick={handleLogout}>
-          <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
-        </button>
+        <div className="user-menu">
+          <button className="user-avatar" onClick={toggleMenu}>
+            <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
+          </button>
+          {menuVisible && (
+            <div className="menu-dropdown">
+              <button className="menu-item" onClick={() => navigate("/perfil-cajero")}>Perfil</button>
+              <button className="menu-item" onClick={() => navigate("/configuracion-cajero")}>Configuración</button>
+              <button className="menu-item" onClick={handleLogout}>Cerrar Sesión</button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="welcome-main">
@@ -76,16 +94,16 @@ const CajeroPage: React.FC = () => {
             </ul>
           </div>
         </div>
-        <div className="continue-button-container">
-  <button className="continue-button" onClick={() => navigate("/dashboard")}>
-    Continuar
-  </button>
-</div>
-
+        <div className="button-container">
+          <button className="return-button" onClick={handleGoBack}>
+            Regresar
+          </button>
+          <button className="continue-button" onClick={() => navigate("/dashboard-cajero")}>
+            Continuar
+          </button>
+        </div>
       </main>
     </div>
-    
-    
   )
 }
 

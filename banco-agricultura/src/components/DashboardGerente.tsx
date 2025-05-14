@@ -1,11 +1,12 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./style/DashboardGerente.css"
 
 const DashboardGerente: React.FC = () => {
   const navigate = useNavigate()
+  const [menuVisible, setMenuVisible] = useState(false)
 
   const handleLogout = () => {
     navigate("/login")
@@ -15,6 +16,10 @@ const DashboardGerente: React.FC = () => {
     navigate(path)
   }
 
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -22,9 +27,18 @@ const DashboardGerente: React.FC = () => {
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="dashboard-logo" />
         </div>
         <h1 className="dashboard-title">Panel Gerente General</h1>
-        <button className="user-avatar" onClick={handleLogout}>
-          <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
-        </button>
+        <div className="user-menu">
+          <button className="user-avatar" onClick={toggleMenu}>
+            <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
+          </button>
+          {menuVisible && (
+            <div className="menu-dropdown">
+              <button className="menu-item" onClick={() => handleNavigate("/perfil-gerente")}>Perfil</button>
+              <button className="menu-item" onClick={() => handleNavigate("/configuracion-gerente")}>Configuración</button>
+              <button className="menu-item" onClick={handleLogout}>Cerrar Sesión</button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="dashboard-main">
@@ -45,6 +59,11 @@ const DashboardGerente: React.FC = () => {
           <button className="option-button" onClick={() => handleNavigate("/nueva-sucursal")}>
             <img src="/assets/sucursal-icon.png" alt="Nueva Sucursal" className="option-icon" />
             <span>NUEVA SUCURSAL</span>
+          </button>
+        </div>
+        <div className="return-button-container">
+          <button className="return-button" onClick={() => handleNavigate("/gerente")}>
+            Regresar
           </button>
         </div>
       </main>

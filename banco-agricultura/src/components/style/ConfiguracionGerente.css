@@ -1,0 +1,165 @@
+.configuracionDashboardContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.configuracionDashboardHeader {
+  background-color: #4da150;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.configuracionLogoContainer {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.configuracionLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.configuracionDashboardTitle {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.configuracionAvatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: #9ca3af;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.configuracionAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Menú desplegable */
+.configuracionMenuDropdown {
+  position: absolute;
+  top: 4.5rem;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  min-width: 180px;
+}
+
+.configuracionMenuItem {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.configuracionMenuItem:hover {
+  background-color: #f3f4f6;
+}
+
+.configuracionDashboardMain {
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.configuracionContentContainer {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.configuracionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #333;
+  text-align: center;
+}
+
+.configuracionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.configuracionFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.configuracionLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.configuracionInput {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.configuracionInput:focus {
+  outline: none;
+  border-color: #4da150;
+  box-shadow: 0 0 0 2px rgba(77, 161, 80, 0.2);
+}
+
+.configuracionButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.configuracionSaveButton,
+.gerenteConfiguracionReturnButton {
+  flex: 1;
+  min-width: 130px;
+  background-color: #4da150;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.configuracionSaveButton:hover,
+.gerenteConfiguracionReturnButton:hover {
+  background-color: #3b823d;
+}

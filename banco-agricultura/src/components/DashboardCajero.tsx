@@ -1,11 +1,12 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./style/DashboardCajero.css"
 
 const DashboardCajero: React.FC = () => {
   const navigate = useNavigate()
+  const [menuVisible, setMenuVisible] = useState(false)
 
   const handleLogout = () => {
     navigate("/login")
@@ -15,6 +16,10 @@ const DashboardCajero: React.FC = () => {
     navigate(path)
   }
 
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+
   return (
     <div className="cajeroDashboardContainer">
       <header className="cajeroDashboardHeader">
@@ -22,9 +27,18 @@ const DashboardCajero: React.FC = () => {
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="cajeroLogo" />
         </div>
         <h1 className="cajeroDashboardTitle">Cajero</h1>
-        <button className="cajeroAvatar" onClick={handleLogout}>
-          <img src="/assets/Usuario.png" alt="Usuario" className="cajeroAvatarImage" />
-        </button>
+        <div className="cajeroUserMenu">
+          <button className="cajeroAvatar" onClick={toggleMenu}>
+            <img src="/assets/Usuario.png" alt="Usuario" className="cajeroAvatarImage" />
+          </button>
+          {menuVisible && (
+            <div className="cajeroMenuDropdown">
+              <button className="cajeroMenuItem" onClick={() => handleNavigate("/perfil-cajero")}>Perfil</button>
+              <button className="cajeroMenuItem" onClick={() => handleNavigate("/configuracion-cajero")}>Configuración</button>
+              <button className="cajeroMenuItem" onClick={handleLogout}>Cerrar Sesión</button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="cajeroDashboardMain">
@@ -44,6 +58,11 @@ const DashboardCajero: React.FC = () => {
           <button className="cajeroOptionButton" onClick={() => handleNavigate("/transaccion")}>
             <img src="/assets/transaccion.png" alt="Transacción" className="cajeroOptionIcon" />
             <span>TRANSACCIÓN</span>
+          </button>
+        </div>
+        <div className="cajeroReturnButtonContainer">
+          <button className="cajeroReturnButton" onClick={() => handleNavigate("/cajero")}>
+            Regresar
           </button>
         </div>
       </main>
