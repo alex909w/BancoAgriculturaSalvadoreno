@@ -26,7 +26,7 @@ const DashboardCliente: React.FC = () => {
         <div className="clienteLogoContainer">
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="clienteLogo" />
         </div>
-        <h1 className="clienteDashboardTitle">Panel de Clientes</h1>
+        <h1 className="clienteDashboardTitle">PANEL DE CLIENTES</h1>
         <div className="clienteUserMenu">
           <button className="clienteAvatar" onClick={toggleMenu}>
             <img src="/assets/Usuario.png" alt="Usuario" className="clienteAvatarImage" />
@@ -78,9 +78,6 @@ const DashboardCliente: React.FC = () => {
           <button className="clienteActionButton" onClick={() => handleNavigate("/historial-transacciones")}>
             <img src="/assets/historial.png" alt="Historial de Transacciones" className="clienteActionIcon" />
             <span>HISTORIAL DE TRANSACCIONES</span>
-          </button>
-          <button className="clienteRegisterButton" onClick={() => handleNavigate("/cliente")}>
-            <span>REGRESAR</span>
           </button>
         </div>
       </main>

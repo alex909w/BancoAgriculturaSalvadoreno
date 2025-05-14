@@ -65,14 +65,14 @@ const ClientePage: React.FC = () => {
                 <span>Consultar estados de cuenta y gestionar tus finanzas en cualquier momento.</span>
               </li>
               <li className="reminder-item">
-                <span className="check-mark">✓</span>
-                <span>Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</span>
-                </li>
-               </ul>
-           <h2 className="reminders-title">¡Crecemos contigo y con el campo. ¡Impulsa tu producción con nosotros!</h2>
-          </div>
-        </div>
-
+              <span className="check-mark">✓</span>
+              <span>Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</span>
+              </li>
+             </ul>
+             <br /> {/* Salto de línea */}
+              <p className="reminders-title">¡Crecemos contigo y con el campo e impulsa tu producción con nosotros!</p>
+              </div>
+            </div>
         <div className="button-container">
           <button className="continue-button" onClick={() => navigate("/dashboard-cliente")}>
             Continuar

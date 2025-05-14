@@ -3,19 +3,33 @@ import "./style/LoadingDots.css";
 
 const LoadingDots: React.FC = () => {
   const [dots, setDots] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prevDots) => {
-        if (prevDots.length >= 3) {
-          return "";
-        }
-        return prevDots + "●";
-      });
-    }, 500);
+    let interval: NodeJS.Timeout;
+    let timeout: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
-  }, []);
+    if (isLoading) {
+      interval = setInterval(() => {
+        setDots((prevDots) => {
+          if (prevDots.length >= 3) {
+            return "";
+          }
+          return prevDots + "●";
+        });
+      }, 500);
+
+      timeout = setTimeout(() => {
+        setIsLoading(false);
+        clearInterval(interval);
+      }, 6000); // Detener después de 6 segundos
+    }
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isLoading]);
 
   return (
     <div className="loading-dots">

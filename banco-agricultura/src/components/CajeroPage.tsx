@@ -95,9 +95,6 @@ const CajeroPage: React.FC = () => {
           </div>
         </div>
         <div className="button-container">
-          <button className="return-button" onClick={handleGoBack}>
-            Regresar
-          </button>
           <button className="continue-button" onClick={() => navigate("/dashboard-cajero")}>
             Continuar
           </button>

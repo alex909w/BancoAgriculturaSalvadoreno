@@ -26,6 +26,10 @@ const ConfiguracionPage: React.FC = () => {
     }
   }, [])
 
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+
   return (
     <div className="configuracionDashboardContainer">
       <header className="configuracionDashboardHeader">
@@ -33,10 +37,8 @@ const ConfiguracionPage: React.FC = () => {
           <img src="/assets/logo-login.png" alt="Logo" className="configuracionLogo" />
         </div>
 
-        <h1 className="configuracionDashboardTitle">Configuración</h1>
-
-        <div className="configuracionAvatar" ref={menuRef}>
-          <button className="configuracionAvatar" onClick={() => setMenuVisible(!menuVisible)}>
+        <div className="configuracionUserMenu" ref={menuRef}>
+          <button className="configuracionAvatar" onClick={toggleMenu}>
             <img src="/assets/Usuario.png" alt="Usuario" className="configuracionAvatarImage" />
           </button>
 

@@ -26,7 +26,7 @@ const DashboardGerente: React.FC = () => {
         <div className="dashboard-logo-container">
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="dashboard-logo" />
         </div>
-        <h1 className="dashboard-title">Panel Gerente General</h1>
+        <h1 className="dashboard-title">PANEL GERENTE GENERAL</h1>
         <div className="user-menu">
           <button className="user-avatar" onClick={toggleMenu}>
             <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
@@ -43,7 +43,7 @@ const DashboardGerente: React.FC = () => {
 
       <main className="dashboard-main">
         <div className="action-panel">
-          <img src="/assets/customer-service.png" alt="Selecciona una acción" className="action-image" />
+          <img src="/assets/gerente.png" alt="Selecciona una acción" className="action-image" />
           <p className="action-text">Selecciona una acción</p>
         </div>
 
@@ -59,11 +59,6 @@ const DashboardGerente: React.FC = () => {
           <button className="option-button" onClick={() => handleNavigate("/nueva-sucursal")}>
             <img src="/assets/sucursal-icon.png" alt="Nueva Sucursal" className="option-icon" />
             <span>NUEVA SUCURSAL</span>
-          </button>
-        </div>
-        <div className="return-button-container">
-          <button className="return-button" onClick={() => handleNavigate("/gerente")}>
-            Regresar
           </button>
         </div>
       </main>

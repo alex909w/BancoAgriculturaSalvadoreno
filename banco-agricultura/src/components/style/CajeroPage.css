@@ -135,7 +135,7 @@
   margin-top: 2rem;
 }
 
-.return-button, .continue-button {
+.continue-button {
   background-color: #4da150;
   color: white;
   font-size: 1.125rem;
@@ -147,7 +147,7 @@
   transition: background-color 0.3s ease;
 }
 
-.return-button:hover, .continue-button:hover {
+.continue-button:hover {
   background-color: #3d8741;
 }
 
