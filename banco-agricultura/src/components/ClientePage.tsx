@@ -23,7 +23,6 @@ const ClientePage: React.FC = () => {
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="welcome-logo" />
         </div>
 
-        {/* Avatar con menú desplegable */}
         <div className="user-menu">
           <button className="user-avatar" onClick={handleToggleMenu}>
             <img src="/assets/Usuario.png" alt="Cliente" className="avatar-image" />
@@ -39,24 +38,38 @@ const ClientePage: React.FC = () => {
       </header>
 
       <main className="welcome-main">
-        <h1 className="welcome-title">Bienvenido, estimado cliente</h1>
+        <h1 className="welcome-title">¡Bienvenido a AgroBanco Salvadoreño!</h1>
 
         <div className="welcome-content">
           <div className="service-image-container">
-            <img src="/assets/customer-service.png" alt="Atención al cliente" className="service-image" />
+            <img src="/assets/cliente.png" alt="Atención al cliente" className="service-image" />
           </div>
 
           <div className="reminders-container">
-            <h2 className="reminders-title">En AgroBanco Salvadoreño, ofrecemos soluciones financieras diseñadas para el sector agrícola.
-              Nuestra plataforma te permite:</h2>
+            <h2 className="reminders-title">En AgroBanco Salvadoreño, ofrecemos soluciones financieras diseñadas para el sector agrícola. Nuestra plataforma te permite:</h2>
             <ul className="reminders-list">
-              <li className="reminder-item"><span className="check-mark">✓</span> Solicitar créditos agrícolas para financiar cultivos, maquinaria y crecimiento de tu negocio.</li>
-              <li className="reminder-item"><span className="check-mark">✓</span> Abrir y administrar cuentas diseñadas para productores y emprendedores del campo.</li>
-              <li className="reminder-item"><span className="check-mark">✓</span> Realizar transferencias y pagos de forma rápida y segura.</li>
-              <li className="reminder-item"><span className="check-mark">✓</span> Consultar estados de cuenta y gestionar tus finanzas en cualquier momento.</li>
-              <li className="reminder-item"><span className="check-mark">✓</span> Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</li>
-            </ul>
-            <h2 className="reminders-title">Crecemos contigo y con el campo. ¡Impulsa tu producción con nosotros!</h2>
+              <li className="reminder-item">
+                <span className="check-mark">✓</span>
+                <span>Solicitar créditos agrícolas para financiar cultivos, maquinaria y crecimiento de tu negocio.</span>
+              </li>
+              <li className="reminder-item">
+                <span className="check-mark">✓</span>
+                <span>Abrir y administrar cuentas diseñadas para productores y emprendedores del campo.</span>
+              </li>
+              <li className="reminder-item">
+                <span className="check-mark">✓</span>
+                <span>Realizar transferencias y pagos de forma rápida y segura.</span>
+              </li>
+              <li className="reminder-item">
+                <span className="check-mark">✓</span>
+                <span>Consultar estados de cuenta y gestionar tus finanzas en cualquier momento.</span>
+              </li>
+              <li className="reminder-item">
+                <span className="check-mark">✓</span>
+                <span>Acceder a programas de apoyo y subsidios exclusivos para el sector agropecuario.</span>
+                </li>
+               </ul>
+           <h2 className="reminders-title">¡Crecemos contigo y con el campo. ¡Impulsa tu producción con nosotros!</h2>
           </div>
         </div>
 
