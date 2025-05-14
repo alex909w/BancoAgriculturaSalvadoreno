@@ -96,9 +96,9 @@
 }
 
 .service-image {
-  max-width: 120%;
+  max-width: 105%;
   height: auto;
-  max-height: 45rem;
+  max-height: 47rem;
   object-fit: contain;
 }
 

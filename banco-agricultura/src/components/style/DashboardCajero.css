@@ -24,7 +24,7 @@
 
 .cajeroDashboardTitle {
   color: white;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
@@ -80,11 +80,19 @@
 }
 
 .cajeroActionPanel {
-  background-color: #f3f4f6;
+  background-color: white;
   border-radius: 10px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+
+.action-cajero-image {
+  max-width: 100%;
+  height: 100%;
+  max-height: 13rem;
+  object-fit: contain;
 }
 
 .cajeroActionText {
@@ -95,7 +103,6 @@
 
 .cajeroOptionsContainer {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -108,10 +115,10 @@
   background-color: #f8f9fa;
   border: none;
   border-radius: 10px;
-  padding: 1.5rem;
+  padding: 1rem;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cajeroOptionIcon {
@@ -119,5 +126,3 @@
   height: 3rem;
   margin-bottom: 0.5rem;
 }
-
-

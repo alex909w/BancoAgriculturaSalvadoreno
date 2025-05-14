@@ -43,6 +43,7 @@ const DashboardCajero: React.FC = () => {
 
       <main className="cajeroDashboardMain">
         <div className="cajeroActionPanel">
+          <img src="/assets/cajero.png" alt="Selecciona una acción" className="action-cajero-image" />
           <p className="cajeroActionText">Selecciona que tipo de movimiento quieres realizar</p>
         </div>
 
