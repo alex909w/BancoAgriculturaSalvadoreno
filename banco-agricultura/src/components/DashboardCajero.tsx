@@ -26,7 +26,7 @@ const DashboardCajero: React.FC = () => {
         <div className="cajeroLogoContainer">
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="cajeroLogo" />
         </div>
-        <h1 className="cajeroDashboardTitle">CAJERO</h1>
+        <h1 className="cajeroDashboardTitle">Cajero</h1>
         <div className="cajeroUserMenu">
           <button className="cajeroAvatar" onClick={toggleMenu}>
             <img src="/assets/Usuario.png" alt="Usuario" className="cajeroAvatarImage" />
@@ -48,7 +48,7 @@ const DashboardCajero: React.FC = () => {
         </div>
 
         <div className="cajeroOptionsContainer">
-          <button className="cajeroOptionButton" onClick={() => handleNavigate("/registro-cliente")}>
+          <button className="cajeroOptionButton" onClick={() => handleNavigate("/crear-cliente")}>
             <img src="/assets/nuevo-usuario.png" alt="Registrar Nuevo Cliente" className="cajeroOptionIcon" />
             <span>REGISTRAR NUEVO CLIENTE</span>
           </button>

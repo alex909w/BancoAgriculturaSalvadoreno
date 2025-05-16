@@ -14,6 +14,14 @@ import CajeroPerfil from "./components/CajeroPerfil"
 import CajeroConfiguracion from "./components/CajeroConfiguracion"
 import ClienteConfiguracion from "./components/ClienteConfiguracion"
 import ClientePerfil from "./components/ClientePerfil"
+import CrearCliente from "./components/CrearCliente"
+import Prestamos from "./components/Prestamos"
+import Transaccion from "./components/Transaccion"
+import Solicitudes from "./components/Soliciitudes"
+import Movimientos from "./components/Movimientos"
+import NuevaSucursal from "./components/NuevaSucursal"
+import NuevaCuentaCliente from "./components/NuevaCuentaCliente"
+import HistorialTransacciones from "./components/HistorialTransacciones"
 import "./App.css"
 
 function App() {
@@ -35,6 +43,14 @@ function App() {
         <Route path="/configuracion-cajero" element={<CajeroConfiguracion />} />
         <Route path="/configuracion-cliente" element={<ClienteConfiguracion />} />
         <Route path="/perfil-cliente" element={<ClientePerfil />} />
+        <Route path="/crear-cliente" element={<CrearCliente />} />
+        <Route path="/prestamos" element={<Prestamos />} />
+        <Route path="/transaccion" element={<Transaccion />} />
+        <Route path="/solicitudes" element={<Solicitudes />} />
+        <Route path="/movimientos" element={<Movimientos />} />
+        <Route path="/nueva-sucursal" element={<NuevaSucursal />} />
+        <Route path="/nueva-cuenta-cliente" element={<NuevaCuentaCliente />} />
+        <Route path="/historial-transacciones" element={<HistorialTransacciones />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

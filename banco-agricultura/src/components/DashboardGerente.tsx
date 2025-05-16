@@ -26,7 +26,7 @@ const DashboardGerente: React.FC = () => {
         <div className="dashboard-logo-container">
           <img src="/assets/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="dashboard-logo" />
         </div>
-        <h1 className="dashboard-title">PANEL GERENTE GENERAL</h1>
+        <h1 className="dashboard-title">Panel Gerente General</h1>
         <div className="user-menu">
           <button className="user-avatar" onClick={toggleMenu}>
             <img src="/assets/Usuario.png" alt="Usuario" className="avatar-image" />
