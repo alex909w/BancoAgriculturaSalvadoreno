@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "./style/ConfiguracionGerente.css"
 
-const ConfiguracionPage: React.FC = () => {
+const GerenteConfiguracion: React.FC = () => {
   const navigate = useNavigate()
   const [menuVisible, setMenuVisible] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -85,4 +85,4 @@ const ConfiguracionPage: React.FC = () => {
   )
 }
 
-export default ConfiguracionPage
+export default GerenteConfiguracion

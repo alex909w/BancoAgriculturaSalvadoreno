@@ -86,7 +86,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
   text-align: center;
-  grid-column: 1 / -1;
 }
 
 .adminDashboardIcon {
@@ -112,12 +111,7 @@
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.3s ease;
   text-align: center;
-}
-
-.adminDashboardOption:hover {
-  transform: translateY(-5px);
 }
 
 .adminDashboardOption h3 {
