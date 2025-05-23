@@ -1,0 +1,15 @@
+.cells {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+}
+.ingresos {
+    width: 100%;
+    padding: 10px;
+}
+
+.egresos {
+    width: 100%;
+    padding: 10px;
+}

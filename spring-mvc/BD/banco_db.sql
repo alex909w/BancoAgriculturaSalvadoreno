@@ -20,7 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `banco_db`
 --
-CREATE DATABASE IF NOT EXISTS `banco_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS `banco_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `banco_db`;
 
 -- --------------------------------------------------------
@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS `cliente`;
 CREATE TABLE IF NOT EXISTS `cliente` (
   `id_cliente` int NOT NULL AUTO_INCREMENT,
   `id_usuario` int DEFAULT NULL,
-  `dui` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `dui` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nombres` varchar(100) DEFAULT NULL,
   `apellidos` varchar(100) DEFAULT NULL,
   `direccion` varchar(200) DEFAULT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   `salario` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id_cliente`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cliente`
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `cuenta` (
   `saldo` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id_cuenta`),
   KEY `id_cliente` (`id_cliente`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cuenta`
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `dependiente` (
   `comision` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id_dependiente`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `dependiente`
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `empleado` (
   KEY `id_usuario` (`id_usuario`),
   KEY `id_sucursal` (`id_sucursal`),
   KEY `id_rol` (`id_rol`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `empleado`
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `movimiento` (
   `cuenta_destino` int DEFAULT NULL,
   PRIMARY KEY (`id_movimiento`),
   KEY `id_cuenta` (`id_cuenta`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `movimiento`
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `prestamo` (
   PRIMARY KEY (`id_prestamo`),
   KEY `id_cliente` (`id_cliente`),
   KEY `id_cajero` (`id_cajero`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `prestamo`
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `rol` (
   `id_rol` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`id_rol`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `rol`
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `sucursal` (
   `direccion` varchar(200) DEFAULT NULL,
   `telefono` varchar(9) DEFAULT NULL,
   PRIMARY KEY (`id_sucursal`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `sucursal`
@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `usuario` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
   PRIMARY KEY (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
