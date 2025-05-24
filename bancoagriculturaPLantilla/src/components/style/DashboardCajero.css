@@ -1,0 +1,143 @@
+.cajeroDashboardContainer {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.cajeroDashboardHeader {
+  background-color: #4da150;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cajeroLogoContainer {
+  width: 4rem;
+  height: 4rem;
+}
+
+.cajeroLogo {
+  width: 247%;
+  height: 98%;
+  object-fit: cover;
+}
+
+.cajeroDashboardTitle {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.cajeroUserMenu {
+  position: relative;
+}
+
+.cajeroAvatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background-color: #9ca3af;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.cajeroAvatarImage {
+  width: 100%;
+  height: 125%;
+  object-fit: cover;
+}
+
+.cajeroMenuDropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.cajeroMenuItem {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cajeroMenuItem:hover {
+  background-color: #f0f0f0;
+}
+
+.cajeroDashboardMain {
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.cajeroActionPanel {
+  background-color: #f3f4f6;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.cajeroActionText {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.cajeroOptionsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cajeroOptionButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
+
+.cajeroOptionIcon {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.cajeroReturnButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.cajeroReturnButton {
+  background-color: #4da150;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cajeroReturnButton:hover {
+  background-color: #3d8741;
+}
