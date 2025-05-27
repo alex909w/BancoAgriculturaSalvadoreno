@@ -1,24 +1,24 @@
 package com.bancoagricola.api.service;
 
-import com.bancoagricola.api.exception.BadRequestException;
-import com.bancoagricola.api.exception.ResourceNotFoundException;
-import com.bancoagricola.api.model.Usuario;
-import com.bancoagricola.api.model.Cliente;
-import com.bancoagricola.api.model.Empleado;
-import com.bancoagricola.api.model.Dependiente;
-import com.bancoagricola.api.repository.UsuarioRepository;
-import com.bancoagricola.api.repository.ClienteRepository;
-import com.bancoagricola.api.repository.EmpleadoRepository;
-import com.bancoagricola.api.repository.DependienteRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
-import java.util.ArrayList;
+import com.bancoagricola.api.exception.BadRequestException;
+import com.bancoagricola.api.exception.ResourceNotFoundException;
+import com.bancoagricola.api.model.Cliente;
+import com.bancoagricola.api.model.Dependiente;
+import com.bancoagricola.api.model.Empleado;
+import com.bancoagricola.api.model.Usuario;
+import com.bancoagricola.api.repository.ClienteRepository;
+import com.bancoagricola.api.repository.DependienteRepository;
+import com.bancoagricola.api.repository.EmpleadoRepository;
+import com.bancoagricola.api.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {

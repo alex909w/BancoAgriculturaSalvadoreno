@@ -66,11 +66,13 @@ public class UsuarioController {
     public ResponseEntity<Map<String, Object>> getTiposUsuario() {
         Map<String, Object> response = new HashMap<>();
         response.put("tipos", new String[]{"EMPLEADO", "CLIENTE", "DEPENDIENTE"});
-        response.put("descripcion", Map.of(
-            "EMPLEADO", "Personal del banco (cajeros, gerentes, asesores)",
-            "CLIENTE", "Clientes del banco con cuentas",
-            "DEPENDIENTE", "Comercios afiliados"
-        ));
+        
+        Map<String, String> descripcion = new HashMap<>();
+        descripcion.put("EMPLEADO", "Personal del banco (cajeros, gerentes, asesores)");
+        descripcion.put("CLIENTE", "Clientes del banco con cuentas");
+        descripcion.put("DEPENDIENTE", "Comercios afiliados");
+        response.put("descripcion", descripcion);
+        
         return ResponseEntity.ok(response);
     }
 }
