@@ -1,0 +1,121 @@
+.configuracionAdminContainer {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.configuracionAdminHeader {
+  background-color: #4da150;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.configuracionAdminLogoContainer {
+  width: 4rem;
+  height: 4rem;
+}
+
+.configuracionAdminLogo {
+  width: 247%;
+  height: 98%;
+  object-fit: cover;
+}
+
+.configuracionAdminTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.configuracionAdminUserMenu {
+  position: relative;
+}
+
+.configuracionAdminAvatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background-color: #9ca3af;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.configuracionAdminAvatarImage {
+  width: 100%;
+  height: 125%;
+  object-fit: cover;
+}
+
+.configuracionAdminMenuDropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.configuracionAdminMenuItem {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.configuracionAdminMenuItem:hover {
+  background-color: #f0f0f0;
+}
+
+.configuracionAdminMain {
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.configuracionAdminContent {
+  background-color: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.configuracionAdminFormGroup {
+  margin-bottom: 1rem;
+}
+
+.configuracionAdminLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.configuracionAdminInput {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+.configuracionAdminSaveButton {
+  background-color: #4da150;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.configuracionAdminSaveButton:hover {
+  background-color: #3d8741;
+}

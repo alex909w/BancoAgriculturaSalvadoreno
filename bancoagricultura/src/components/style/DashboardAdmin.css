@@ -1,0 +1,124 @@
+.adminDashboardContainer {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.adminDashboardHeader {
+  background-color: #4da150;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adminLogoContainer {
+  width: 4rem;
+  height: 4rem;
+}
+
+.adminLogo {
+  width: 247%;
+  height: 98%;
+  object-fit: cover;
+}
+
+.adminDashboardTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.adminUserMenu {
+  position: relative;
+}
+
+.adminAvatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background-color: #9ca3af;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.adminAvatarImage {
+  width: 100%;
+  height: 125%;
+  object-fit: cover;
+}
+
+.adminMenuDropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.adminMenuItem {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.adminMenuItem:hover {
+  background-color: #f0f0f0;
+}
+
+.adminDashboardMain {
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.adminDashboardWelcomeBox {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.adminDashboardIcon {
+  width: 200px;
+  height: 190px;
+  margin-bottom: 1rem;
+}
+
+.adminDashboardWelcomeText {
+  font-size: 2rem;
+  color: #000000;
+}
+
+.adminDashboardOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.adminDashboardOption {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-align: center;
+}
+
+.adminDashboardOption h3 {
+  margin-bottom: 0.5rem;
+  color: #4da150;
+}
+
+.adminDashboardOption p {
+  color: #6b7280;
+}

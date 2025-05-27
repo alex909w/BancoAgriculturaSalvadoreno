@@ -1,0 +1,191 @@
+.gerenteDashboardContainer {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.gerenteDashboardHeader {
+  background-color: #4da150;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gerenteLogoContainer {
+  width: 4rem;
+  height: 4rem;
+}
+
+.gerenteLogo {
+  width: 247%;
+  height: 98%;
+  object-fit: cover;
+}
+
+.gerenteUserMenu {
+  position: relative;
+}
+
+.gerenteAvatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background-color: #9ca3af;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.gerenteAvatarImage {
+  width: 100%;
+  height: 125%;
+  object-fit: cover;
+}
+
+.gerenteMenuDropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.gerenteMenuItem {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.gerenteMenuItem:hover {
+  background-color: #f0f0f0;
+}
+
+.gerenteDashboardMain {
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.gerenteWelcomeTitle {
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.gerenteWelcomeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.gerenteWelcomeBox {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.gerenteWelcomeSubtitle {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.gerenteWelcomeRole {
+  font-size: 1rem;
+  margin: 0;
+  color: #666;
+}
+
+.gerenteContentContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 1rem;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gerenteTextContainer {
+  flex: 2;
+  padding: 1rem;
+}
+
+.gerenteImagesContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+}
+
+.gerenteStatsTitle, .gerenteBranchesTitle {
+  font-size: 3rem;
+  margin: 0 0 2rem 0;
+}
+
+.gerenteStatsList, .gerenteBranchesList {
+  list-style: none;
+  padding: 0;
+}
+
+.gerenteStatsItem, .gerenteBranchItem {
+  margin-bottom: 3rem;
+}
+
+.gerenteCheckMark {
+  margin-right: 0.5rem;
+  color: #4da150;
+}
+
+.gerenteStatsImage, .gerenteBranchImage {
+  width: 106%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.gerenteContinueButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.gerenteContinueButton {
+  background-color: #4da150;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.gerenteContinueButton:hover {
+  background-color: #3d8741;
+}
+
+@media (min-width: 768px) {
+  .gerenteContentContainer {
+    flex-direction: row;
+  }
+
+  .gerenteTextContainer {
+    margin-right: 1rem;
+  }
+
+  .gerenteImagesContainer {
+    flex-direction: column;
+  }
+}
