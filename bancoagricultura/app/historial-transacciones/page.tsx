@@ -17,14 +17,10 @@ export default function HistorialTransaccionesPage() {
   const router = useRouter()
   const [menuVisible, setMenuVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [ingresos, setIngresos] = useState<Transaction[]>([
-    { fecha: "23/12/23", descripcion: "Descripción", monto: "75.45 US", tipo: "Ingreso" },
-    { fecha: "23/12/23", descripcion: "Descripción", monto: "75.45 US", tipo: "Ingreso" },
-  ])
-  const [egresos, setEgresos] = useState<Transaction[]>([
-    { fecha: "23/12/23", descripcion: "Descripción", monto: "75.45 US", tipo: "Egreso" },
-    { fecha: "23/12/23", descripcion: "Descripción", monto: "75.45 US", tipo: "Egreso" },
-  ])
+  const [ingresos, setIngresos] = useState<Transaction[]>([])
+  const [egresos, setEgresos] = useState<Transaction[]>([])
+  const [allIngresos, setAllIngresos] = useState<Transaction[]>([])
+  const [allEgresos, setAllEgresos] = useState<Transaction[]>([])
   const [filtro, setFiltro] = useState("todos")
 
   useEffect(() => {
@@ -40,7 +36,6 @@ export default function HistorialTransaccionesPage() {
     // Intentar cargar datos reales
     loadTransactions()
   }, [router])
-
   const loadTransactions = async () => {
     try {
       const clienteId = localStorage.getItem("userId")
@@ -49,7 +44,7 @@ export default function HistorialTransaccionesPage() {
         // Intentar obtener cuentas del cliente
         const cuentasResponse = await cuentasAPI.getByCliente(Number.parseInt(clienteId))
 
-        if (!cuentasResponse.error && cuentasResponse.length > 0) {
+        if (!cuentasResponse.error && Array.isArray(cuentasResponse) && cuentasResponse.length > 0) {
           const allIngresos: Transaction[] = []
           const allEgresos: Transaction[] = []
 
@@ -57,14 +52,19 @@ export default function HistorialTransaccionesPage() {
           for (const cuenta of cuentasResponse) {
             const transResponse = await transaccionesAPI.getByCuenta(cuenta.id)
 
-            if (!transResponse.error && transResponse.length > 0) {
+            if (!transResponse.error && Array.isArray(transResponse) && transResponse.length > 0) {
               transResponse.forEach((trans: any) => {
-                const formattedTrans = {
+                const tipoTransaccion: "Ingreso" | "Egreso" = trans.tipo === "DEPOSITO" ? "Ingreso" : "Egreso"
+                  const formattedTrans: Transaction = {
                   id: trans.id,
-                  fecha: new Date(trans.fecha).toLocaleDateString(),
-                  descripcion: trans.descripcion || "Descripción",
-                  monto: `${trans.monto.toFixed(2)} US`,
-                  tipo: trans.tipo === "DEPOSITO" ? "Ingreso" : "Egreso",
+                  fecha: new Date(trans.fecha).toLocaleDateString("es-SV", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                  }),
+                  descripcion: trans.descripcion || "Sin descripción",
+                  monto: `${Number(trans.monto).toFixed(2)} USD`,
+                  tipo: tipoTransaccion,
                 }
 
                 if (formattedTrans.tipo === "Ingreso") {
@@ -74,24 +74,69 @@ export default function HistorialTransaccionesPage() {
                 }
               })
             }
+          }          // Ordenar por fecha más reciente primero
+          const sortByDate = (a: Transaction, b: Transaction) => {
+            // Las fechas vienen formateadas como dd/mm/yyyy desde toLocaleDateString
+            const dateA = new Date(a.fecha.split('/').reverse().join('/'))
+            const dateB = new Date(b.fecha.split('/').reverse().join('/'))
+            return dateB.getTime() - dateA.getTime()
           }
 
-          if (allIngresos.length > 0) {
-            setIngresos(allIngresos)
-          }
-
-          if (allEgresos.length > 0) {
-            setEgresos(allEgresos)
-          }
+          allIngresos.sort(sortByDate)
+          allEgresos.sort(sortByDate)          // Actualizar estado (guardar todos los datos y aplicar filtro)
+          setAllIngresos(allIngresos)
+          setAllEgresos(allEgresos)
+          setIngresos(allIngresos)
+          setEgresos(allEgresos)
+        } else {
+          // Si no hay cuentas o hay error, mostrar listas vacías
+          setIngresos([])
+          setEgresos([])
         }
       }
     } catch (error) {
       console.error("Error al cargar transacciones:", error)
-      // Mantenemos los datos de ejemplo como respaldo
+      // En caso de error, limpiar las listas
+      setIngresos([])
+      setEgresos([])
     } finally {
       setIsLoading(false)
     }
   }
+  // Función para filtrar transacciones por fecha
+  const filterTransactionsByDate = (transactions: Transaction[], filter: string): Transaction[] => {
+    if (filter === "todos") return transactions
+
+    const now = new Date()
+    const filterDate = new Date()
+
+    switch (filter) {
+      case "semana":
+        filterDate.setDate(now.getDate() - 7)
+        break
+      case "mes":
+        filterDate.setMonth(now.getMonth() - 1)
+        break
+      case "año":
+        filterDate.setFullYear(now.getFullYear() - 1)
+        break
+      default:
+        return transactions
+    }
+
+    return transactions.filter(transaction => {
+      // Convertir la fecha formateada (dd/mm/yyyy) a Date para comparación
+      const [day, month, year] = transaction.fecha.split('/')
+      const transactionDate = new Date(Number(year), Number(month) - 1, Number(day))
+      return transactionDate >= filterDate
+    })
+  }
+
+  // Efecto para aplicar filtro cuando cambia
+  useEffect(() => {
+    setIngresos(filterTransactionsByDate(allIngresos, filtro))
+    setEgresos(filterTransactionsByDate(allEgresos, filtro))
+  }, [filtro, allIngresos, allEgresos])
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
@@ -169,30 +214,43 @@ export default function HistorialTransaccionesPage() {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">            <div>
               <h2 className="text-2xl font-bold text-center mb-6">INGRESOS</h2>
               <div className="space-y-4">
-                {ingresos.map((transaction, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-md">
-                    <p className="font-medium">Descripción: {transaction.descripcion}</p>
-                    <p className="text-green-600 font-bold">{transaction.monto}</p>
-                    <p className="text-gray-600 text-sm">{transaction.fecha}</p>
+                {ingresos.length > 0 ? (
+                  ingresos.map((transaction, index) => (
+                    <div key={transaction.id || index} className="bg-gray-50 p-4 rounded-md">
+                      <p className="font-medium">Descripción: {transaction.descripcion}</p>
+                      <p className="text-green-600 font-bold">{transaction.monto}</p>
+                      <p className="text-gray-600 text-sm">{transaction.fecha}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No hay ingresos para mostrar</p>
+                    <p className="text-sm">{filtro !== "todos" ? "Prueba con un filtro diferente" : "Aún no has recibido ingresos"}</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
             <div>
               <h2 className="text-2xl font-bold text-center mb-6">EGRESOS</h2>
               <div className="space-y-4">
-                {egresos.map((transaction, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-md">
-                    <p className="font-medium">Descripción: {transaction.descripcion}</p>
-                    <p className="text-red-600 font-bold">{transaction.monto}</p>
-                    <p className="text-gray-600 text-sm">{transaction.fecha}</p>
+                {egresos.length > 0 ? (
+                  egresos.map((transaction, index) => (
+                    <div key={transaction.id || index} className="bg-gray-50 p-4 rounded-md">
+                      <p className="font-medium">Descripción: {transaction.descripcion}</p>
+                      <p className="text-red-600 font-bold">{transaction.monto}</p>
+                      <p className="text-gray-600 text-sm">{transaction.fecha}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No hay egresos para mostrar</p>
+                    <p className="text-sm">{filtro !== "todos" ? "Prueba con un filtro diferente" : "Aún no has realizado retiros"}</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

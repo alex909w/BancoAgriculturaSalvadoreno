@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { cuentasAPI, tiposCuentaAPI } from "@/lib/api"
+import { cuentasAPI, tiposCuentaAPI, sucursalesAPI, usuariosAPI } from "@/lib/api"
 
 interface TipoCuenta {
   id: number
@@ -15,29 +15,40 @@ interface TipoCuenta {
   comision?: number
 }
 
+interface Sucursal {
+  id: number
+  nombre: string
+  codigo?: string
+  direccion?: string
+  departamento?: string
+}
+
+interface UserData {
+  id: number
+  nombre: string
+  apellido?: string
+  email?: string
+  dui?: string
+  telefono?: string
+  cuentasEnPosesion?: number
+}
+
 export default function NuevaCuentaClientePage() {
   const router = useRouter()
   const [menuVisible, setMenuVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [tiposCuenta, setTiposCuenta] = useState<TipoCuenta[]>([])
+  const [sucursales, setSucursales] = useState<Sucursal[]>([])
+  const [userData, setUserData] = useState<UserData | null>(null)
   const [formData, setFormData] = useState({
     tipoCuentaId: "",
     sucursal: "",
     correoElectronico: "",
+    saldoInicial: "",
     agregarBeneficiario: false,
     agregarSeguro: false,
     aceptaTerminos: false,
   })
-
-  // Datos del cliente (simulados)
-  const userData = {
-    nombre: "Farmacia San Lorenzo",
-    tipoCuenta: "Dependiente",
-    idCliente: "150343434SL",
-    giroComercial: "Farmaceutica",
-    cuentasEnPosesion: 2,
-  }
-
   useEffect(() => {
     // Verificar autenticación
     const authToken = localStorage.getItem("authToken")
@@ -48,10 +59,77 @@ export default function NuevaCuentaClientePage() {
       return
     }
 
-    // Cargar tipos de cuenta
-    loadTiposCuenta()
+    // Cargar datos iniciales
+    loadInitialData()
   }, [router])
 
+  const loadInitialData = async () => {
+    try {
+      await Promise.all([
+        loadTiposCuenta(),
+        loadSucursales(),
+        loadUserData()
+      ])
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadUserData = async () => {
+    try {
+      const userId = localStorage.getItem("userId")
+      if (userId) {
+        const response = await usuariosAPI.getById(Number.parseInt(userId))
+        if (response && !response.error) {
+          // Obtener número de cuentas del usuario
+          const cuentasResponse = await cuentasAPI.getByCliente(Number.parseInt(userId))
+          const numCuentas = Array.isArray(cuentasResponse) ? cuentasResponse.length : 0
+          
+          setUserData({
+            ...response,
+            cuentasEnPosesion: numCuentas
+          })
+          
+          // Pre-llenar el email si está disponible
+          if (response.email) {
+            setFormData(prev => ({
+              ...prev,
+              correoElectronico: response.email
+            }))
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar datos del usuario:", error)
+    }
+  }
+
+  const loadSucursales = async () => {
+    try {
+      const response = await sucursalesAPI.getAll()
+      if (response && !response.error && Array.isArray(response)) {
+        setSucursales(response)
+      } else {
+        // Sucursales por defecto si la API falla
+        setSucursales([
+          { id: 1, nombre: "Sucursal Principal" },
+          { id: 2, nombre: "Sucursal Centro" },
+          { id: 3, nombre: "Sucursal Norte" },
+          { id: 4, nombre: "Sucursal Sur" },
+        ])
+      }
+    } catch (error) {
+      console.error("Error al cargar sucursales:", error)
+      setSucursales([
+        { id: 1, nombre: "Sucursal Principal" },
+        { id: 2, nombre: "Sucursal Centro" },
+        { id: 3, nombre: "Sucursal Norte" },
+        { id: 4, nombre: "Sucursal Sur" },
+      ])
+    }
+  }
   const loadTiposCuenta = async () => {
     try {
       console.log("Cargando tipos de cuenta...")
@@ -77,8 +155,6 @@ export default function NuevaCuentaClientePage() {
         { id: 2, nombre: "Cuenta Corriente", descripcion: "Cuenta para movimientos frecuentes" },
         { id: 3, nombre: "Cuenta Empresarial", descripcion: "Cuenta para empresas" },
       ])
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -103,128 +179,83 @@ export default function NuevaCuentaClientePage() {
       [name]: type === "checkbox" ? checked : value,
     }))
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.aceptaTerminos) {
       alert("Debe aceptar los términos y condiciones")
       return
+    }    if (!formData.tipoCuentaId || !formData.sucursal || !formData.correoElectronico || !formData.saldoInicial) {
+      alert("Por favor complete todos los campos obligatorios")
+      return
     }
 
-    if (!formData.tipoCuentaId || !formData.sucursal || !formData.correoElectronico) {
-      alert("Por favor complete todos los campos obligatorios")
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.correoElectronico)) {
+      alert("Por favor ingrese un correo electrónico válido")
+      return
+    }
+
+    // Validar saldo inicial
+    const saldo = Number.parseFloat(formData.saldoInicial)
+    if (isNaN(saldo) || saldo < 0) {
+      alert("Por favor ingrese un saldo inicial válido (mayor o igual a 0)")
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Obtener el ID del cliente desde localStorage
       const clienteId = localStorage.getItem("userId")
-      const userName = localStorage.getItem("userName")
-
-      console.log("=== DEBUGGING DATOS DE USUARIO ===")
-      console.log("clienteId desde localStorage:", clienteId)
-      console.log("userName desde localStorage:", userName)
 
       if (!clienteId || clienteId === "null" || clienteId === "undefined") {
-        console.error("ERROR: clienteId no válido:", clienteId)
         alert("Error: No se encontró la información del cliente. Por favor, inicie sesión nuevamente.")
         setIsLoading(false)
         return
       }
 
-      // Convertir a número y validar
       const clienteIdNumero = Number.parseInt(clienteId)
-      console.log("clienteId convertido a número:", clienteIdNumero)
-
       if (isNaN(clienteIdNumero)) {
-        console.error("ERROR: clienteId no es un número válido:", clienteId)
         alert("Error: ID de cliente inválido. Por favor, inicie sesión nuevamente.")
         setIsLoading(false)
         return
-      }
-
-      // Obtener el tipo de cuenta seleccionado
-      const tipoSeleccionado = tiposCuenta.find((tipo) => tipo.id === Number.parseInt(formData.tipoCuentaId))
-
-      // Generar número de cuenta único
-      const timestamp = Date.now()
-      const random = Math.floor(Math.random() * 10000)
-      const numeroCuenta = `${timestamp}${random}`
-
-      // Obtener fecha actual en formato correcto
-      const fechaActual = new Date()
-      const fechaApertura = fechaActual.toISOString().split("T")[0] // YYYY-MM-DD
-
-      // Preparar los datos con nombres de campos en snake_case (como espera la BD)
+      }      // Preparar los datos para crear la cuenta (estructura correcta según backend)
       const cuentaData = {
-        // Campos básicos
-        numero: numeroCuenta,
-        saldo: 0.0,
-        estado: "activa",
-        fecha_apertura: fechaApertura, // snake_case
-
-        // IDs de relaciones con nombres en snake_case
-        cliente_id: clienteIdNumero,
-        sucursal_id: Number.parseInt(formData.sucursal),
-        tipo_cuenta_id: Number.parseInt(formData.tipoCuentaId),
+        cliente: { id: clienteIdNumero },
+        tipoCuenta: { id: Number.parseInt(formData.tipoCuentaId) },
+        sucursal: { id: Number.parseInt(formData.sucursal) },
+        saldo: saldo,
+        tieneSeguro: formData.agregarSeguro
       }
 
-      console.log("=== DATOS CON SNAKE_CASE ===")
-      console.log("Datos completos:", cuentaData)
-      console.log("cliente_id:", cuentaData.cliente_id)
-      console.log("sucursal_id:", cuentaData.sucursal_id)
-      console.log("tipo_cuenta_id:", cuentaData.tipo_cuenta_id)
+      console.log("Creando cuenta con datos:", cuentaData)
 
-      // También probar con camelCase por si acaso
-      const cuentaDataCamelCase = {
-        numero: numeroCuenta,
-        saldo: 0.0,
-        estado: "activa",
-        fechaApertura: fechaApertura,
-        clienteId: clienteIdNumero,
-        sucursalId: Number.parseInt(formData.sucursal),
-        tipoCuentaId: Number.parseInt(formData.tipoCuentaId),
-      }
-
-      console.log("=== DATOS CON CAMELCASE ===")
-      console.log("Datos completos:", cuentaDataCamelCase)
-
-      // Intentar primero con snake_case
-      console.log("Intentando crear cuenta con snake_case...")
-      let response = await cuentasAPI.create(cuentaData)
-
-      // Si falla, intentar con camelCase
-      if (response && response.error) {
-        console.log("Snake_case falló, intentando con camelCase...")
-        response = await cuentasAPI.create(cuentaDataCamelCase)
-      }
-
-      console.log("Respuesta final de la API:", response)
+      const response = await cuentasAPI.create(cuentaData)
 
       if (response && response.error) {
         console.error("Error al crear cuenta:", response)
-        alert(`Error al crear la cuenta: ${response.message || "Error del servidor"}`)
-      } else if (response) {
+        alert(`Error al crear la cuenta: ${response.message || "Error del servidor"}`)      } else if (response) {
         console.log("Cuenta creada exitosamente:", response)
-        alert("¡Cuenta creada exitosamente!")
-
-        // Limpiar el formulario
+        const numeroCuenta = response.cuenta?.numeroCuenta || response.numeroCuenta || "Generado automáticamente"
+        alert(`¡Cuenta creada exitosamente!\nNúmero de cuenta: ${numeroCuenta}`)        // Limpiar el formulario
         setFormData({
           tipoCuentaId: "",
           sucursal: "",
           correoElectronico: "",
+          saldoInicial: "",
           agregarBeneficiario: false,
           agregarSeguro: false,
           aceptaTerminos: false,
         })
 
+        // Recargar datos del usuario para actualizar el número de cuentas
+        await loadUserData()
+
         // Redirigir al dashboard después de un breve delay
         setTimeout(() => {
           router.push("/dashboard-cliente")
-        }, 1500)
+        }, 2000)
       } else {
         console.error("Respuesta vacía o inválida:", response)
         alert("Error: No se recibió respuesta del servidor")
@@ -332,9 +363,7 @@ export default function NuevaCuentaClientePage() {
                     />
                     Agregar seguro
                   </label>
-                </div>
-
-                <div className="mb-4">
+                </div>                <div className="mb-4">
                   <label htmlFor="sucursal" className="block mb-2 font-medium">
                     Sucursal de preferencia: *
                   </label>
@@ -347,14 +376,15 @@ export default function NuevaCuentaClientePage() {
                     required
                   >
                     <option value="">Seleccione una sucursal</option>
-                    <option value="1">Sucursal Principal (ID: 1)</option>
-                    <option value="2">Sucursal Centro (ID: 2)</option>
-                    <option value="3">Sucursal Norte (ID: 3)</option>
-                    <option value="4">Sucursal Sur (ID: 4)</option>
+                    {sucursales.map((sucursal) => (
+                      <option key={sucursal.id} value={sucursal.id}>
+                        {sucursal.nombre}
+                        {sucursal.codigo && ` (${sucursal.codigo})`}
+                        {sucursal.departamento && ` - ${sucursal.departamento}`}
+                      </option>
+                    ))}
                   </select>
-                </div>
-
-                <div className="mb-4">
+                </div>                <div className="mb-4">
                   <label htmlFor="correoElectronico" className="block mb-2 font-medium">
                     Correo electrónico: *
                   </label>
@@ -367,6 +397,27 @@ export default function NuevaCuentaClientePage() {
                     className="w-full border border-gray-300 rounded-md p-2"
                     required
                   />
+                </div>
+
+                <div className="mb-4">
+                  <label htmlFor="saldoInicial" className="block mb-2 font-medium">
+                    Saldo inicial: *
+                  </label>
+                  <input
+                    type="number"
+                    id="saldoInicial"
+                    name="saldoInicial"
+                    value={formData.saldoInicial}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    required
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Ingrese el monto con el que desea abrir la cuenta (mínimo $0.00)
+                  </p>
                 </div>
 
                 <div className="mb-6">
@@ -399,27 +450,31 @@ export default function NuevaCuentaClientePage() {
                   </button>
                 </div>
               </form>
-            </div>
-
-            <div className="flex-1 flex flex-col items-center justify-center">
+            </div>            <div className="flex-1 flex flex-col items-center justify-center">
               <img src="/imagenes/usuario.png" alt="Usuario" className="w-32 h-32 mb-4" />
-              <div className="text-center space-y-2">
-                <p>
-                  <strong>Nombre:</strong> {userData.nombre}
-                </p>
-                <p>
-                  <strong>Tipo de Cuenta:</strong> {userData.tipoCuenta}
-                </p>
-                <p>
-                  <strong>ID de Cliente:</strong> {userData.idCliente}
-                </p>
-                <p>
-                  <strong>Giro Comercial:</strong> {userData.giroComercial}
-                </p>
-                <p>
-                  <strong>Cuentas en Posesión:</strong> {userData.cuentasEnPosesion}
-                </p>
-              </div>
+              {userData ? (
+                <div className="text-center space-y-2">
+                  <p>
+                    <strong>Nombre:</strong> {userData.nombre} {userData.apellido || ""}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {userData.email || "No registrado"}
+                  </p>
+                  <p>
+                    <strong>DUI:</strong> {userData.dui || "No disponible"}
+                  </p>
+                  <p>
+                    <strong>Teléfono:</strong> {userData.telefono || "No registrado"}
+                  </p>
+                  <p>
+                    <strong>Cuentas en Posesión:</strong> {userData.cuentasEnPosesion || 0}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-500">Cargando información del usuario...</p>
+                </div>
+              )}
 
               {/* Información del tipo de cuenta seleccionado */}
               {formData.tipoCuentaId && (

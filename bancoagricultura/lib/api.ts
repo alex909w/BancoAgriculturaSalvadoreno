@@ -133,6 +133,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/deposito", { method: "POST", body: JSON.stringify(data) }),
   retiro: (data: {
     cuentaId: number
@@ -140,6 +141,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/retiro", { method: "POST", body: JSON.stringify(data) }),
   transferencia: (data: {
     cuentaOrigenId: number
@@ -148,6 +150,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/transferencia", { method: "POST", body: JSON.stringify(data) }),
 }
 
