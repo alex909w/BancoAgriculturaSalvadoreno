@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { usuariosAPI } from "@/lib/api"
 
 interface Usuario {
   id: number
@@ -16,38 +15,27 @@ interface Usuario {
   }
 }
 
+async function fetchUsuarios() {
+  const response = await fetch("http://localhost:8081/api/usuarios", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("Error al cargar usuarios")
+  }
+
+  return await response.json()
+}
+
 export default function ResumenUsuarios() {
   const router = useRouter()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(true)
   const [menuVisible, setMenuVisible] = useState(false)
-
-  const useMockData = useCallback(() => {
-    const mockUsuarios: Usuario[] = [
-      {
-        id: 1,
-        username: "usuario1",
-        nombreCompleto: "Usuario 1",
-        email: "usuario1@example.com",
-        rol: { id: 3, nombre: "Cliente" },
-      },
-      {
-        id: 2,
-        username: "usuario2",
-        nombreCompleto: "Usuario 2",
-        email: "usuario2@example.com",
-        rol: { id: 2, nombre: "Gerente" },
-      },
-      {
-        id: 3,
-        username: "usuario3",
-        nombreCompleto: "Usuario 3",
-        email: "usuario3@example.com",
-        rol: { id: 3, nombre: "Cliente" },
-      },
-    ]
-    setUsuarios(mockUsuarios)
-  }, [])
 
   useEffect(() => {
     // Verificar autenticación
@@ -65,25 +53,36 @@ export default function ResumenUsuarios() {
     }
 
     loadUsuarios()
-  }, [router, useMockData])
-
-  const loadUsuarios = async () => {
+  }, [router])
+    const loadUsuarios = async () => {
     try {
       setLoading(true)
-      const data = await usuariosAPI.getAll()
+      console.log("Intentando cargar usuarios desde la API...")
+      const data = await fetchUsuarios()
+      console.log("Respuesta completa de la API:", data)
+      console.log("Tipo de datos recibidos:", typeof data)
+      console.log("¿Es array?", Array.isArray(data))
+      console.log("Longitud si es array:", Array.isArray(data) ? data.length : 'No es array')
 
-      // Verificar si hay un error en la respuesta
-      if (data && data.error) {
-        console.error("Error al cargar usuarios:", data.message)
-        // Si hay error, usamos datos simulados
-        useMockData()
-      } else {
-        // Si la respuesta es exitosa, usamos los datos reales
+      if (Array.isArray(data)) {
+        console.log(`Cargados ${data.length} usuarios desde la API`)
         setUsuarios(data)
+      } else if (data && data.data && Array.isArray(data.data)) {
+        // La respuesta podría estar envuelta en un objeto con propiedad 'data'
+        console.log(`Encontrados ${data.data.length} usuarios en data.data`)
+        setUsuarios(data.data)
+      } else if (data && data.usuarios && Array.isArray(data.usuarios)) {
+        // O podría estar en una propiedad 'usuarios'
+        console.log(`Encontrados ${data.usuarios.length} usuarios en data.usuarios`)
+        setUsuarios(data.usuarios)
+      } else {
+        console.warn("La respuesta de la API no es un array válido:", data)
+        console.warn("Estructura de la respuesta:", Object.keys(data || {}))
+        setUsuarios([])
       }
     } catch (error) {
-      console.error("Error inesperado:", error)
-      useMockData()
+      console.error("Error al cargar usuarios:", error)
+      setUsuarios([])
     } finally {
       setLoading(false)
     }
@@ -133,20 +132,93 @@ export default function ResumenUsuarios() {
         </div>
       </header>
 
-      <main className="p-6 max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-6">Lista de Usuarios</h2>
-
-          {loading ? (
+      <main className="p-6 max-w-4xl mx-auto">        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">Lista de Usuarios</h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={loadUsuarios}
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⟳</span>
+                    Cargando...
+                  </>
+                ) : (
+                  <>
+                    🔄 Recargar
+                  </>
+                )}
+              </button>
+              <button
+                onClick={async () => {
+                  console.log("=== DEBUG: Probando API Usuarios ===")
+                  console.log("Token:", localStorage.getItem("authToken"))
+                  console.log("UserRole:", localStorage.getItem("userRole"))
+                  try {
+                    console.log("Haciendo petición a: http://localhost:8081/api/usuarios")
+                    const response = await fetch("http://localhost:8081/api/usuarios", {
+                      method: "GET",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                      },
+                    })
+                    console.log("Status de respuesta:", response.status)
+                    console.log("Headers de respuesta:", Object.fromEntries(response.headers.entries()))
+                    
+                    const data = await response.json()
+                    console.log("Datos recibidos:", data)
+                    console.log("Tipo de datos:", typeof data)
+                    console.log("¿Es array?", Array.isArray(data))
+                    console.log("Claves del objeto:", data && typeof data === 'object' ? Object.keys(data) : 'No es objeto')
+                    
+                    if (Array.isArray(data)) {
+                      console.log("Longitud del array:", data.length)
+                      console.log("Primer elemento:", data[0])
+                    } else if (data && typeof data === 'object') {
+                      console.log("Estructura del objeto:", JSON.stringify(data, null, 2))
+                    }
+                  } catch (error) {
+                    console.error("Error en debug:", error)
+                  }
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              >
+                🔍 Debug API
+              </button>
+            </div>
+          </div>          {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">Cargando usuarios...</p>
+              <div className="animate-spin text-4xl mb-4">⟳</div>
+              <p className="text-gray-500">Cargando usuarios desde la API...</p>
+            </div>
+          ) : usuarios.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No se encontraron usuarios.</p>
+              <button
+                onClick={loadUsuarios}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                🔄 Intentar nuevamente
+              </button>
             </div>
           ) : (
             <div className="space-y-6">
+              <div className="border rounded-lg p-3 bg-green-50 border-green-200">
+                <p className="font-medium text-green-800">
+                  ✅ Total de usuarios: {usuarios.length} (datos desde la API)
+                </p>
+              </div>
               {usuarios.map((usuario) => (
                 <div key={usuario.id} className="border-b pb-4 last:border-b-0">
                   <p className="font-semibold">
                     Nombre: <span className="font-normal">{usuario.nombreCompleto}</span>
+                  </p>
+                  <p className="font-semibold">
+                    Username: <span className="font-normal">{usuario.username}</span>
                   </p>
                   <p className="font-semibold">
                     Correo Electrónico: <span className="font-normal">{usuario.email}</span>
