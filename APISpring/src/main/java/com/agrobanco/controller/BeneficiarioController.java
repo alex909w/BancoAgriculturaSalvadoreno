@@ -59,8 +59,7 @@ public class BeneficiarioController {
     public ResponseEntity<List<Beneficiario>> getBeneficiariosByCuentaId(@PathVariable Integer cuentaId) {
         try {
             List<Beneficiario> beneficiarios = beneficiarioService.findByCuentaId(cuentaId);
-            return ResponseEntity.ok(beneficiarios);
-        } catch (Exception e) {
+            return ResponseEntity.ok(beneficiarios);        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

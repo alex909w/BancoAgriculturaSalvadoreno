@@ -42,6 +42,7 @@ com\agrobanco\service\AuthService.class
 com\agrobanco\controller\UsuarioController.class
 com\agrobanco\model\Sucursal.class
 com\agrobanco\repository\TipoPrestamoRepository.class
+com\agrobanco\controller\DataFixController.class
 com\agrobanco\model\Transaccion.class
 com\agrobanco\service\TipoCuentaService.class
 com\agrobanco\repository\TransaccionRepository.class

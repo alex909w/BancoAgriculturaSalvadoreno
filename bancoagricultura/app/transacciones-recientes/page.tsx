@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { transaccionesAPI } from "@/lib/api"
 
 interface Transaccion {
   id: number
@@ -35,45 +34,27 @@ interface Transaccion {
   estado: string
 }
 
+async function fetchTransacciones() {
+  const response = await fetch("http://localhost:8081/api/transacciones", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("Error al cargar transacciones")
+  }
+
+  return await response.json()
+}
+
 export default function TransaccionesRecientes() {
   const router = useRouter()
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [loading, setLoading] = useState(true)
   const [menuVisible, setMenuVisible] = useState(false)
-  const [usingMockData, setUsingMockData] = useState(false)
-
-  const useMockData = useCallback(() => {
-    const mockTransacciones: Transaccion[] = [
-      {
-        id: 1,
-        numeroTransaccion: "TRX202401001",
-        tipoTransaccion: { id: 1, nombre: "Depósito" },
-        cuentaDestino: { id: 1, numeroCuenta: "1000000001" },
-        monto: 100.0,
-        comision: 0.0,
-        fechaTransaccion: "2023-12-23T10:30:00",
-        cajero: { id: 2, nombreCompleto: "María García" },
-        sucursal: { id: 1, nombre: "Sucursal Central" },
-        descripcion: "Depósito",
-        estado: "completada",
-      },
-      {
-        id: 2,
-        numeroTransaccion: "TRX202401002",
-        tipoTransaccion: { id: 2, nombre: "Retiro" },
-        cuentaOrigen: { id: 2, numeroCuenta: "1000000002" },
-        monto: 50.0,
-        comision: 1.0,
-        fechaTransaccion: "2023-12-23T11:15:00",
-        cajero: { id: 2, nombreCompleto: "María García" },
-        sucursal: { id: 1, nombre: "Sucursal Central" },
-        descripcion: "Retiro",
-        estado: "completada",
-      },
-    ]
-    setTransacciones(mockTransacciones)
-    setUsingMockData(true)
-  }, [setTransacciones])
 
   useEffect(() => {
     // Verificar autenticación
@@ -91,27 +72,36 @@ export default function TransaccionesRecientes() {
     }
 
     loadTransacciones()
-  }, [router, useMockData])
-
+  }, [router])
   const loadTransacciones = async () => {
     try {
       setLoading(true)
-      // Usar el endpoint real
-      const data = await transaccionesAPI.getAll()
+      console.log("Intentando cargar transacciones desde la API...")
+      const data = await fetchTransacciones()
+      console.log("Respuesta completa de la API:", data)
+      console.log("Tipo de datos recibidos:", typeof data)
+      console.log("¿Es array?", Array.isArray(data))
+      console.log("Longitud si es array:", Array.isArray(data) ? data.length : 'No es array')
 
-      // Verificar si hay un error en la respuesta
-      if (data && data.error) {
-        console.error("Error al cargar transacciones:", data.message)
-        // Si hay error, usamos datos simulados
-        useMockData()
-      } else {
-        // Si la respuesta es exitosa, usamos los datos reales
+      if (Array.isArray(data)) {
+        console.log(`Cargadas ${data.length} transacciones desde la API`)
         setTransacciones(data)
-        setUsingMockData(false)
+      } else if (data && data.data && Array.isArray(data.data)) {
+        // La respuesta podría estar envuelta en un objeto con propiedad 'data'
+        console.log(`Encontradas ${data.data.length} transacciones en data.data`)
+        setTransacciones(data.data)
+      } else if (data && data.transacciones && Array.isArray(data.transacciones)) {
+        // O podría estar en una propiedad 'transacciones'
+        console.log(`Encontradas ${data.transacciones.length} transacciones en data.transacciones`)
+        setTransacciones(data.transacciones)
+      } else {
+        console.warn("La respuesta de la API no es un array válido:", data)
+        console.warn("Estructura de la respuesta:", Object.keys(data || {}))
+        setTransacciones([])
       }
     } catch (error) {
-      console.error("Error inesperado:", error)
-      useMockData()
+      console.error("Error al cargar transacciones:", error)
+      setTransacciones([])
     } finally {
       setLoading(false)
     }
@@ -181,16 +171,83 @@ export default function TransaccionesRecientes() {
         </div>
       </header>
 
-      <main className="p-6 max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-6">Transacciones Recientes</h2>
-
-          {loading ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">Cargando transacciones...</p>
+      <main className="p-6 max-w-4xl mx-auto">        <div className="bg-white rounded-lg shadow-md p-6">          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">Transacciones Recientes</h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={loadTransacciones}
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⟳</span>
+                    Cargando...
+                  </>
+                ) : (
+                  <>
+                    🔄 Recargar
+                  </>
+                )}
+              </button>              <button
+                onClick={async () => {
+                  console.log("=== DEBUG: Probando API Transacciones ===")
+                  console.log("Token:", localStorage.getItem("authToken"))
+                  console.log("UserRole:", localStorage.getItem("userRole"))
+                  try {
+                    console.log("Haciendo petición a: http://localhost:8081/api/transacciones")
+                    const response = await fetch("http://localhost:8081/api/transacciones", {
+                      method: "GET",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                      },
+                    })
+                    console.log("Status de respuesta:", response.status)
+                    console.log("Headers de respuesta:", Object.fromEntries(response.headers.entries()))
+                    
+                    const data = await response.json()
+                    console.log("Datos recibidos:", data)
+                    console.log("Tipo de datos:", typeof data)
+                    console.log("¿Es array?", Array.isArray(data))
+                    console.log("Claves del objeto:", data && typeof data === 'object' ? Object.keys(data) : 'No es objeto')
+                    
+                    if (Array.isArray(data)) {
+                      console.log("Longitud del array:", data.length)
+                      console.log("Primer elemento:", data[0])
+                    } else if (data && typeof data === 'object') {
+                      console.log("Estructura del objeto:", JSON.stringify(data, null, 2))
+                    }
+                  } catch (error) {
+                    console.error("Error en debug:", error)
+                  }
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              >
+                🔍 Debug API
+              </button>
             </div>
-          ) : (
+          </div>{loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin text-4xl mb-4">⟳</div>
+              <p className="text-gray-500">Cargando transacciones desde la API...</p>
+            </div>
+          ) : transacciones.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No se encontraron transacciones.</p>
+              <button
+                onClick={loadTransacciones}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                🔄 Intentar nuevamente
+              </button>
+            </div>          ) : (
             <div className="space-y-6">
+              <div className="border rounded-lg p-3 bg-green-50 border-green-200">
+                <p className="font-medium text-green-800">
+                  ✅ Total de transacciones: {transacciones.length} (datos desde la API)
+                </p>
+              </div>
               {transacciones.map((transaccion) => (
                 <div key={transaccion.id} className="border-b pb-4 last:border-b-0">
                   <p className="font-semibold">

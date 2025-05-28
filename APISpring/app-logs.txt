@@ -1,0 +1,76 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------< com.agrobanco:agrobanco-salvadoreno-api >---------------
+[INFO] Building agrobanco-salvadoreno-api 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:2.7.18:run (default-cli) > test-compile @ agrobanco-salvadoreno-api >>>
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ agrobanco-salvadoreno-api ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ agrobanco-salvadoreno-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 67 source files to c:\Users\rosma\OneDrive\Escritorio\DWF\BancoAgriculturaSalvadoreno\APISpring\target\classes
+[INFO] /c:/Users/rosma/OneDrive/Escritorio/DWF/BancoAgriculturaSalvadoreno/APISpring/src/main/java/com/agrobanco/service/PagoPrestamoService.java: c:\Users\rosma\OneDrive\Escritorio\DWF\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\service\PagoPrestamoService.java uses or overrides a deprecated API.
+[INFO] /c:/Users/rosma/OneDrive/Escritorio/DWF/BancoAgriculturaSalvadoreno/APISpring/src/main/java/com/agrobanco/service/PagoPrestamoService.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.2.0:testResources (default-testResources) @ agrobanco-salvadoreno-api ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory c:\Users\rosma\OneDrive\Escritorio\DWF\BancoAgriculturaSalvadoreno\APISpring\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ agrobanco-salvadoreno-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] 
+[INFO] <<< spring-boot:2.7.18:run (default-cli) < test-compile @ agrobanco-salvadoreno-api <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:2.7.18:run (default-cli) @ agrobanco-salvadoreno-api ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::               (v2.7.18)
+
+2025-05-27 23:13:37.378  INFO 33540 --- [           main] com.agrobanco.AgroBancoApplication       : Starting AgroBancoApplication using Java 21.0.7 on LAPTOP-5L7EPFB1 with PID 33540 (C:\Users\rosma\OneDrive\Escritorio\DWF\BancoAgriculturaSalvadoreno\APISpring\target\classes started by rosma in c:\Users\rosma\OneDrive\Escritorio\DWF\BancoAgriculturaSalvadoreno\APISpring)
+2025-05-27 23:13:37.382 DEBUG 33540 --- [           main] com.agrobanco.AgroBancoApplication       : Running with Spring Boot v2.7.18, Spring v5.3.31
+2025-05-27 23:13:37.382  INFO 33540 --- [           main] com.agrobanco.AgroBancoApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-05-27 23:13:40.682  INFO 33540 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-27 23:13:41.027  INFO 33540 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 324 ms. Found 14 JPA repository interfaces.
+2025-05-27 23:13:42.894  INFO 33540 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8081 (http)
+2025-05-27 23:13:42.922  INFO 33540 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-27 23:13:42.923  INFO 33540 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.83]
+2025-05-27 23:13:43.653  INFO 33540 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-05-27 23:13:43.654  INFO 33540 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 6165 ms
+2025-05-27 23:13:44.295  INFO 33540 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-27 23:13:44.763  INFO 33540 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-27 23:13:45.003  INFO 33540 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-27 23:13:45.138  INFO 33540 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.15.Final
+2025-05-27 23:13:45.606  INFO 33540 --- [           main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-05-27 23:13:45.894  INFO 33540 --- [           main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2025-05-27 23:13:48.196  INFO 33540 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-05-27 23:13:48.228  INFO 33540 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-27 23:13:51.323  WARN 33540 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-27 23:13:52.445  INFO 33540 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 13 endpoint(s) beneath base path '/actuator'
+2025-05-27 23:13:52.572  INFO 33540 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8081 (http) with context path '/api'
+2025-05-27 23:13:52.599  INFO 33540 --- [           main] com.agrobanco.AgroBancoApplication       : Started AgroBancoApplication in 16.512 seconds (JVM running for 18.158)
+2025-05-27 23:14:23.837  INFO 33540 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-27 23:14:23.839  INFO 33540 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-05-27 23:14:23.850  INFO 33540 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:13 min
+[INFO] Finished at: 2025-05-27T23:14:23-06:00
+[INFO] ------------------------------------------------------------------------
+¨Desea terminar el trabajo por lotes (S/N)? 
+^C

@@ -23,34 +23,38 @@ public class TransaccionService {
     
     @Autowired
     private CuentaRepository cuentaRepository;
-    
-    @Autowired
+      @Autowired
     private TipoTransaccionService tipoTransaccionService;    @Transactional(readOnly = true)
     public List<Transaccion> findAll() {
-        List<Transaccion> transacciones = transaccionRepository.findAll();
-        // Inicializar relaciones lazy para evitar LazyInitializationException
-        for (Transaccion transaccion : transacciones) {
-            if (transaccion.getTipoTransaccion() != null) {
-                transaccion.getTipoTransaccion().getNombre(); // Forzar carga
-            }
-            if (transaccion.getCuentaOrigen() != null) {
-                transaccion.getCuentaOrigen().getNumeroCuenta(); // Forzar carga
-            }
-            if (transaccion.getCuentaDestino() != null) {
-                transaccion.getCuentaDestino().getNumeroCuenta(); // Forzar carga
-            }            if (transaccion.getCajero() != null) {
-                transaccion.getCajero().getNombreCompleto(); // Forzar carga
-            }
-            if (transaccion.getSucursal() != null) {
-                transaccion.getSucursal().getNombre(); // Forzar carga
+        try {
+            return transaccionRepository.findAllWithRelations();
+        } catch (Exception e) {
+            // Log el error para debugging
+            System.err.println("Error al obtener transacciones con relaciones: " + e.getMessage());
+            
+            // Fallback: obtener transacciones válidas excluyendo las que tienen sucursal_id = 0
+            try {
+                return transaccionRepository.findAllValidTransactions();
+            } catch (Exception fallbackException) {
+                // Si también falla el fallback, usar consulta básica
+                List<Transaccion> transacciones = transaccionRepository.findAll();
+                // Filtrar transacciones con sucursal nula o inválida
+                return transacciones.stream()
+                    .filter(t -> {
+                        try {
+                            // Verificar que la sucursal sea accesible
+                            return t.getSucursal() != null && t.getSucursal().getId() != null && t.getSucursal().getId() > 0;
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    })
+                    .collect(java.util.stream.Collectors.toList());
             }
         }
-        return transacciones;
     }
-    
     @Transactional(readOnly = true)
     public Optional<Transaccion> findById(Integer id) {
-        return transaccionRepository.findById(id);
+        return transaccionRepository.findByIdWithRelations(id);
     }
     
     @Transactional(readOnly = true)
@@ -60,7 +64,7 @@ public class TransaccionService {
     
     @Transactional(readOnly = true)
     public List<Transaccion> findByCuentaId(Integer cuentaId) {
-        return transaccionRepository.findByCuentaId(cuentaId);
+        return transaccionRepository.findByCuentaIdWithRelations(cuentaId);
     }
     
     @Transactional(readOnly = true)

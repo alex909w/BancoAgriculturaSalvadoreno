@@ -48,8 +48,7 @@ public class Transaccion {
     @JoinColumn(name = "cajero_id")
     @JsonIgnoreProperties({"cuentas", "prestamos", "password"})
     private Usuario cajero;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+      @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sucursal_id", nullable = false)
     @JsonIgnoreProperties({"usuarios", "cuentas"})
     private Sucursal sucursal;
@@ -70,12 +69,15 @@ public class Transaccion {
     
     // Constructores
     public Transaccion() {}
-    
-    @PrePersist
+      @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         if (fechaTransaccion == null) {
             fechaTransaccion = LocalDateTime.now();
+        }
+        // Validación de sucursal
+        if (sucursal == null || sucursal.getId() == null || sucursal.getId() <= 0) {
+            throw new IllegalArgumentException("La transacción debe tener una sucursal válida");
         }
     }
     
