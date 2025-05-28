@@ -1,5 +1,6 @@
 package com.agrobanco.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -18,18 +19,15 @@ public class Transaccion {
     @NotBlank(message = "El número de transacción es requerido")
     @Size(max = 30, message = "El número de transacción no puede exceder 30 caracteres")
     @Column(name = "numero_transaccion", nullable = false, unique = true)
-    private String numeroTransaccion;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
+    private String numeroTransaccion;    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_transaccion_id", nullable = false)
-    private TipoTransaccion tipoTransaccion;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"transacciones"})
+    private TipoTransaccion tipoTransaccion;    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cuenta_origen_id", nullable = false)
-    private Cuenta cuentaOrigen;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"transaccionesOrigen", "transaccionesDestino", "beneficiarios", "cliente"})
+    private Cuenta cuentaOrigen;    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cuenta_destino_id")
+    @JsonIgnoreProperties({"transaccionesOrigen", "transaccionesDestino", "beneficiarios", "cliente"})
     private Cuenta cuentaDestino;
     
     @DecimalMin(value = "0.01", message = "El monto debe ser mayor que 0")
@@ -48,10 +46,12 @@ public class Transaccion {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cajero_id")
+    @JsonIgnoreProperties({"cuentas", "prestamos", "password"})
     private Usuario cajero;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sucursal_id", nullable = false)
+    @JsonIgnoreProperties({"usuarios", "cuentas"})
     private Sucursal sucursal;
     
     @Column(name = "fecha_transaccion")

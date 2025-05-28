@@ -1,5 +1,6 @@
 package com.agrobanco.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "prestamos")
@@ -93,6 +95,10 @@ public class Prestamo {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "prestamo", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<PagoPrestamo> pagosPrestamos;
     
     // Enums
     public enum EstadoPrestamo {
@@ -185,4 +191,7 @@ public class Prestamo {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public List<PagoPrestamo> getPagosPrestamos() { return pagosPrestamos; }
+    public void setPagosPrestamos(List<PagoPrestamo> pagosPrestamos) { this.pagosPrestamos = pagosPrestamos; }
 }

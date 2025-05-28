@@ -2,6 +2,7 @@ package com.agrobanco.service;
 
 import com.agrobanco.model.Transaccion;
 import com.agrobanco.model.Cuenta;
+import com.agrobanco.model.TipoTransaccion;
 import com.agrobanco.repository.TransaccionRepository;
 import com.agrobanco.repository.CuentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,28 @@ public class TransaccionService {
     @Autowired
     private CuentaRepository cuentaRepository;
     
-    @Transactional(readOnly = true)
+    @Autowired
+    private TipoTransaccionService tipoTransaccionService;    @Transactional(readOnly = true)
     public List<Transaccion> findAll() {
-        return transaccionRepository.findAll();
+        List<Transaccion> transacciones = transaccionRepository.findAll();
+        // Inicializar relaciones lazy para evitar LazyInitializationException
+        for (Transaccion transaccion : transacciones) {
+            if (transaccion.getTipoTransaccion() != null) {
+                transaccion.getTipoTransaccion().getNombre(); // Forzar carga
+            }
+            if (transaccion.getCuentaOrigen() != null) {
+                transaccion.getCuentaOrigen().getNumeroCuenta(); // Forzar carga
+            }
+            if (transaccion.getCuentaDestino() != null) {
+                transaccion.getCuentaDestino().getNumeroCuenta(); // Forzar carga
+            }            if (transaccion.getCajero() != null) {
+                transaccion.getCajero().getNombreCompleto(); // Forzar carga
+            }
+            if (transaccion.getSucursal() != null) {
+                transaccion.getSucursal().getNombre(); // Forzar carga
+            }
+        }
+        return transacciones;
     }
     
     @Transactional(readOnly = true)
@@ -52,8 +72,7 @@ public class TransaccionService {
     public List<Transaccion> findBySucursalId(Integer sucursalId) {
         return transaccionRepository.findBySucursalId(sucursalId);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarDeposito(Integer cuentaId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta
         Cuenta cuenta = cuentaRepository.findById(cuentaId)
@@ -63,9 +82,14 @@ public class TransaccionService {
             throw new RuntimeException("La cuenta no está activa");
         }
         
+        // Obtener tipo de transacción para depósito
+        TipoTransaccion tipoDeposito = tipoTransaccionService.findByNombre("Depósito")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Depósito' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoDeposito);
         transaccion.setCuentaOrigen(cuenta);
         transaccion.setMonto(monto);
         transaccion.setComision(BigDecimal.ZERO);
@@ -80,8 +104,7 @@ public class TransaccionService {
         
         return transaccionRepository.save(transaccion);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarRetiro(Integer cuentaId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta
         Cuenta cuenta = cuentaRepository.findById(cuentaId)
@@ -96,9 +119,14 @@ public class TransaccionService {
             throw new RuntimeException("Saldo insuficiente");
         }
         
+        // Obtener tipo de transacción para retiro
+        TipoTransaccion tipoRetiro = tipoTransaccionService.findByNombre("Retiro")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Retiro' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoRetiro);
         transaccion.setCuentaOrigen(cuenta);
         transaccion.setMonto(monto);
         transaccion.setComision(BigDecimal.valueOf(1.00)); // Comisión por retiro
@@ -114,8 +142,7 @@ public class TransaccionService {
         
         return transaccionRepository.save(transaccion);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarTransferencia(Integer cuentaOrigenId, Integer cuentaDestinoId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta origen
         Cuenta cuentaOrigen = cuentaRepository.findById(cuentaOrigenId)
@@ -141,9 +168,14 @@ public class TransaccionService {
             throw new RuntimeException("Saldo insuficiente para realizar la transferencia");
         }
         
+        // Obtener tipo de transacción para transferencia
+        TipoTransaccion tipoTransferencia = tipoTransaccionService.findByNombre("Transferencia")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Transferencia' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoTransferencia);
         transaccion.setCuentaOrigen(cuentaOrigen);
         transaccion.setCuentaDestino(cuentaDestino);
         transaccion.setMonto(monto);
