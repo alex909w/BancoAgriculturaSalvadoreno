@@ -1,5 +1,6 @@
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\service\PrestamoService.java
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\bancoagricola\api\repository\RolRepository.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\AgroBancoApplication.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\bancoagricola\api\controller\HomeController.java
@@ -63,6 +64,8 @@ C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\model\Cuenta.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\bancoagricola\api\controller\ClienteController.java
 =======
+=======
+>>>>>>> Stashed changes
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\controller\SolicitudEmpleadoController.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\service\AuditoriaService.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\service\ConfiguracionSistemaService.java
@@ -130,4 +133,7 @@ C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\model\Cuenta.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\controller\ClienteController.java
 C:\Users\Tecnico\Documents\GitHub\BancoAgriculturaSalvadoreno\APISpring\src\main\java\com\agrobanco\service\SolicitudEmpleadoService.java
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes

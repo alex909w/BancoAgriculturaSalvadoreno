@@ -40,6 +40,10 @@
     "@radix-ui/react-tooltip": "latest",
     "autoprefixer": "^10.4.20",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    "axios": "latest",
+>>>>>>> Stashed changes
 =======
     "axios": "latest",
 >>>>>>> Stashed changes

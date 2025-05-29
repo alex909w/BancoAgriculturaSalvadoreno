@@ -1,6 +1,10 @@
 // Configuración base de la API
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 const API_BASE_URL = "http://localhost:8080/api"
+=======
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+>>>>>>> Stashed changes
 =======
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
 >>>>>>> Stashed changes
@@ -157,6 +161,7 @@ export const usuariosAPI = {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // TRANSACCIONES
 export const transaccionesAPI = {
   getAll: () => apiRequest("/transacciones"),
@@ -214,6 +219,9 @@ export const rolesAPI = {
 }
 
 // SUCURSALES
+=======
+// API de Sucursales
+>>>>>>> Stashed changes
 =======
 // API de Sucursales
 >>>>>>> Stashed changes
