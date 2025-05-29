@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { cuentasAPI, usuariosAPI, operacionesAPI } from "@/lib/api"
+import { cuentasAPI, usuariosAPI } from "@/lib/api"
 
 // Define una interfaz para el tipo de cuenta
 interface Account {
   id?: number
   numero: string
   saldo: string
-  tipo?: string
+  tipo?: string | any // Puede ser un string o un objeto
   fechaApertura?: string
   estado?: string
   clienteId?: number
@@ -167,16 +167,34 @@ export default function DashboardCliente() {
           }
 
           if (cuentasDelCliente.length > 0) {
-            const formattedAccounts = cuentasDelCliente.map((cuenta: any) => ({
-              id: cuenta.id,
-              numero: cuenta.numero || cuenta.numeroCuenta || `CUENTA-${cuenta.id}`,
-              saldo: cuenta.saldo ? `${Number.parseFloat(cuenta.saldo).toFixed(2)} US` : "0.00 US",
-              saldoNumerico: Number.parseFloat(cuenta.saldo) || 0,
-              tipo: cuenta.tipo || cuenta.tipoCuenta || "Cuenta General",
-              fechaApertura: cuenta.fechaApertura || cuenta.fechaCreacion || new Date().toISOString(),
-              estado: cuenta.estado || (cuenta.activo !== false ? "Activa" : "Inactiva"),
-              clienteId: cuenta.clienteId || cuenta.cliente_id,
-            }))
+            const formattedAccounts = cuentasDelCliente.map((cuenta: any) => {
+              // Asegurarse de que el tipo sea un string
+              let tipoString = "Cuenta General"
+              if (cuenta.tipo) {
+                if (typeof cuenta.tipo === "string") {
+                  tipoString = cuenta.tipo
+                } else if (typeof cuenta.tipo === "object" && cuenta.tipo.nombre) {
+                  tipoString = cuenta.tipo.nombre
+                }
+              } else if (cuenta.tipoCuenta) {
+                if (typeof cuenta.tipoCuenta === "string") {
+                  tipoString = cuenta.tipoCuenta
+                } else if (typeof cuenta.tipoCuenta === "object" && cuenta.tipoCuenta.nombre) {
+                  tipoString = cuenta.tipoCuenta.nombre
+                }
+              }
+
+              return {
+                id: cuenta.id,
+                numero: cuenta.numero || cuenta.numeroCuenta || `CUENTA-${cuenta.id}`,
+                saldo: cuenta.saldo ? `${Number.parseFloat(cuenta.saldo).toFixed(2)} US` : "0.00 US",
+                saldoNumerico: Number.parseFloat(cuenta.saldo) || 0,
+                tipo: tipoString,
+                fechaApertura: cuenta.fechaApertura || cuenta.fechaCreacion || new Date().toISOString(),
+                estado: cuenta.estado || (cuenta.activo !== false ? "Activa" : "Inactiva"),
+                clienteId: cuenta.clienteId || cuenta.cliente_id,
+              }
+            })
 
             console.log("Cuentas formateadas:", formattedAccounts)
             setAccounts(formattedAccounts)
@@ -222,51 +240,10 @@ export default function DashboardCliente() {
     setMenuVisible(!menuVisible)
   }
 
-  const handleDetailsClick = async (account: Account) => {
-    setIsLoadingAccountDetails(true)
+  const handleDetailsClick = (account: Account) => {
+    // Simplemente mostrar el modal con los datos que ya tenemos
     setSelectedAccount(account)
     setModalVisible(true)
-
-    // Obtener información actualizada de la cuenta
-    try {
-      if (account.id) {
-        console.log(`Cargando detalles actualizados de la cuenta ID: ${account.id}`)
-        const cuentaResponse = await cuentasAPI.getById(account.id)
-
-        if (!cuentaResponse.error) {
-          console.log("Detalles de cuenta actualizados:", cuentaResponse)
-
-          // También obtener el saldo actual usando el endpoint de operaciones
-          let saldoActual = cuentaResponse.saldo || 0
-          if (account.numero) {
-            try {
-              const saldoResponse = await operacionesAPI.consultarSaldo(account.numero)
-              if (!saldoResponse.error && saldoResponse.saldo !== undefined) {
-                saldoActual = saldoResponse.saldo
-                console.log(`Saldo actual obtenido: ${saldoActual}`)
-              }
-            } catch (saldoError) {
-              console.warn("No se pudo obtener el saldo actual:", saldoError)
-            }
-          }
-
-          const updatedAccount: Account = {
-            ...account,
-            saldo: `${saldoActual.toFixed(2)} US`,
-            saldoNumerico: saldoActual,
-            tipo: cuentaResponse.tipo || cuentaResponse.tipoCuenta || account.tipo,
-            fechaApertura: cuentaResponse.fechaApertura || cuentaResponse.fechaCreacion || account.fechaApertura,
-            estado: cuentaResponse.estado || (cuentaResponse.activo ? "Activa" : "Inactiva") || account.estado,
-          }
-
-          setSelectedAccount(updatedAccount)
-        }
-      }
-    } catch (error) {
-      console.error("Error al cargar detalles de la cuenta:", error)
-    } finally {
-      setIsLoadingAccountDetails(false)
-    }
   }
 
   const closeModal = () => {
@@ -286,6 +263,14 @@ export default function DashboardCliente() {
     } catch {
       return dateString
     }
+  }
+
+  // Función para obtener el tipo de cuenta como string
+  const getTipoCuenta = (tipo: any): string => {
+    if (!tipo) return "No especificado en API"
+    if (typeof tipo === "string") return tipo
+    if (typeof tipo === "object" && tipo.nombre) return tipo.nombre
+    return "Cuenta General"
   }
 
   if (isLoading) {
@@ -450,7 +435,7 @@ export default function DashboardCliente() {
                     <span className="text-green-600 font-bold text-lg">{selectedAccount.saldo}</span>
                   </p>
                   <p>
-                    <strong>Tipo de Cuenta:</strong> {selectedAccount.tipo || "No especificado en API"}
+                    <strong>Tipo de Cuenta:</strong> {getTipoCuenta(selectedAccount.tipo)}
                   </p>
                   <p>
                     <strong>Fecha de Apertura:</strong> {formatDate(selectedAccount.fechaApertura || "")}
