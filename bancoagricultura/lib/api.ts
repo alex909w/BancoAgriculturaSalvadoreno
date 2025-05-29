@@ -1,167 +1,126 @@
 // Configuración base de la API
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-const API_BASE_URL = "http://localhost:8080/api"
-=======
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
->>>>>>> Stashed changes
-=======
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
->>>>>>> Stashed changes
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081/api"
 
-// Función auxiliar para hacer peticiones HTTP
-const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`
+// Función helper para hacer peticiones
+export async function apiRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
+  const token = localStorage.getItem("authToken")
 
   const defaultHeaders = {
     "Content-Type": "application/json",
-    Accept: "application/json",
-  }
-
-  // Agregar token de autenticación si existe
-  const token = localStorage.getItem("authToken")
-  if (token) {
-    defaultHeaders["Authorization"] = `Bearer ${token}`
-  }
-
-  const config: RequestInit = {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers,
-    },
+    ...(token && { Authorization: `Bearer ${token}` }),
   }
 
   try {
-    console.log(`API Request: ${options.method || "GET"} ${url}`)
-    const response = await fetch(url, config)
+    console.log(`Haciendo petición a: ${API_BASE_URL}${endpoint}`)
+    console.log("Opciones:", options)
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    })
+
+    console.log(`Respuesta HTTP: ${response.status} ${response.statusText}`)
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      // Intentar obtener el mensaje de error del servidor
+      let errorMessage = response.statusText
+      try {
+        const errorData = await response.text()
+        console.log("Cuerpo del error:", errorData)
+
+        // Intentar parsear como JSON
+        try {
+          const errorJson = JSON.parse(errorData)
+          errorMessage = errorJson.message || errorJson.error || errorData
+        } catch {
+          errorMessage = errorData || response.statusText
+        }
+      } catch {
+        errorMessage = response.statusText
+      }
+
+      console.error(`Error API: ${response.status} ${response.statusText}`)
+      console.error("Mensaje de error:", errorMessage)
+
+      return {
+        error: true,
+        status: response.status,
+        message: errorMessage,
+      }
     }
 
     const data = await response.json()
-    console.log(`API Response:`, data)
+    console.log("Datos recibidos:", data)
     return data
   } catch (error) {
-    console.error(`API Error for ${endpoint}:`, error)
-    return { error: true, message: error.message }
+    console.error("Error de red:", error)
+    return {
+      error: true,
+      message: "Error de conexión. Verifique su conexión a internet o que el servidor esté funcionando.",
+    }
   }
 }
 
-// API de Préstamos
-export const prestamosAPI = {
-  getAll: () => apiRequest("/prestamos"),
-  getById: (id: number) => apiRequest(`/prestamos/${id}`),
-  getByNumero: (numero: string) => apiRequest(`/prestamos/numero/${numero}`),
-  getByCliente: (clienteId: number) => apiRequest(`/prestamos/cliente/${clienteId}`),
-  getByEstado: (estado: string) => apiRequest(`/prestamos/estado/${estado}`),
-  create: (prestamo: any) =>
-    apiRequest("/prestamos", {
+// AUTENTICACIÓN
+export const authAPI = {
+  login: (username: string, password: string) =>
+    apiRequest("/auth/login", {
       method: "POST",
-      body: JSON.stringify(prestamo),
+      body: JSON.stringify({ username, password }),
     }),
-  aprobar: (id: number, data: { montoAprobado: number; gerenteId: number }) =>
-    apiRequest(`/prestamos/${id}/aprobar`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-  rechazar: (id: number, data: { observaciones: string }) =>
-    apiRequest(`/prestamos/${id}/rechazar`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-  desembolsar: (id: number, data: { cajeroId: number }) =>
-    apiRequest(`/prestamos/${id}/desembolsar`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
+  getInfo: () => apiRequest("/auth/info"),
 }
 
-// API de Transacciones
-export const transaccionesAPI = {
-  getAll: () => apiRequest("/transacciones"),
-  getById: (id: number) => apiRequest(`/transacciones/${id}`),
-  getByNumero: (numero: string) => apiRequest(`/transacciones/numero/${numero}`),
-  getByCuenta: (cuentaId: number) => apiRequest(`/transacciones/cuenta/${cuentaId}`),
-  deposito: (data: any) =>
-    apiRequest("/transacciones/deposito", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  retiro: (data: any) =>
-    apiRequest("/transacciones/retiro", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  transferencia: (data: any) =>
-    apiRequest("/transacciones/transferencia", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-}
-
-// API de Cuentas
-export const cuentasAPI = {
-  getAll: () => apiRequest("/cuentas"),
-  getById: (id: number) => apiRequest(`/cuentas/${id}`),
-  getByNumero: (numero: string) => apiRequest(`/cuentas/numero/${numero}`),
-  getByCliente: (clienteId: number) => apiRequest(`/cuentas/cliente/${clienteId}`),
-  getBySucursal: (sucursalId: number) => apiRequest(`/cuentas/sucursal/${sucursalId}`),
-  getByDui: (dui: string) => apiRequest(`/cuentas/dui/${dui}`),
-  create: (cuenta: any) =>
-    apiRequest("/cuentas", {
-      method: "POST",
-      body: JSON.stringify(cuenta),
-    }),
-  update: (id: number, cuenta: any) =>
-    apiRequest(`/cuentas/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(cuenta),
-    }),
-  updateEstado: (id: number, estado: string) =>
-    apiRequest(`/cuentas/${id}/estado`, {
-      method: "PUT",
-      body: JSON.stringify({ estado }),
-    }),
-  delete: (id: number) =>
-    apiRequest(`/cuentas/${id}`, {
-      method: "DELETE",
-    }),
-}
-
-// API de Usuarios
+// USUARIOS
 export const usuariosAPI = {
   getAll: () => apiRequest("/usuarios"),
   getById: (id: number) => apiRequest(`/usuarios/${id}`),
   getByUsername: (username: string) => apiRequest(`/usuarios/username/${username}`),
   getByEmail: (email: string) => apiRequest(`/usuarios/email/${email}`),
   getByDui: (dui: string) => apiRequest(`/usuarios/dui/${dui}`),
-  getByRol: (rol: string) => apiRequest(`/usuarios/rol/${rol}`),
+  getByRol: (rolNombre: string) => apiRequest(`/usuarios/rol/${rolNombre}`),
   getBySucursal: (sucursalId: number) => apiRequest(`/usuarios/sucursal/${sucursalId}`),
-  create: (usuario: any) =>
-    apiRequest("/usuarios", {
-      method: "POST",
-      body: JSON.stringify(usuario),
-    }),
-  update: (id: number, usuario: any) =>
-    apiRequest(`/usuarios/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(usuario),
-    }),
-  updateEstado: (id: number, estado: string) =>
-    apiRequest(`/usuarios/${id}/estado`, {
-      method: "PUT",
-      body: JSON.stringify({ estado }),
-    }),
-  delete: (id: number) =>
-    apiRequest(`/usuarios/${id}`, {
-      method: "DELETE",
-    }),
+  create: (data: any) => apiRequest("/usuarios", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) => apiRequest(`/usuarios/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  changeStatus: (id: number, estado: string) =>
+    apiRequest(`/usuarios/${id}/estado`, { method: "PUT", body: JSON.stringify({ estado }) }),
+  delete: (id: number) => apiRequest(`/usuarios/${id}`, { method: "DELETE" }),
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+// CUENTAS
+export const cuentasAPI = {
+  getAll: () => apiRequest("/cuentas"),
+  getById: (id: number) => apiRequest(`/cuentas/${id}`),
+  getByNumero: (numeroCuenta: string) => apiRequest(`/cuentas/numero/${numeroCuenta}`),
+  getByCliente: (clienteId: number) => apiRequest(`/cuentas/cliente/${clienteId}`),
+  getBySucursal: (sucursalId: number) => apiRequest(`/cuentas/sucursal/${sucursalId}`),
+  getByDui: (dui: string) => apiRequest(`/cuentas/dui/${dui}`),
+  create: (data: any) => apiRequest("/cuentas", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) => apiRequest(`/cuentas/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  changeStatus: (id: number, estado: string) =>
+    apiRequest(`/cuentas/${id}/estado`, { method: "PUT", body: JSON.stringify({ estado }) }),
+  delete: (id: number) => apiRequest(`/cuentas/${id}`, { method: "DELETE" }),
+}
+
+// OPERACIONES
+export const operacionesAPI = {
+  getCuentasByDui: (dui: string) => apiRequest(`/operaciones/cuentas/${dui}`),
+  abonarEfectivo: (numeroCuenta: string, monto: number) =>
+    apiRequest("/operaciones/abonarefectivo", {
+      method: "POST",
+      body: JSON.stringify({ numeroCuenta, monto }),
+    }),
+  retirarEfectivo: (numeroCuenta: string, monto: number) =>
+    apiRequest("/operaciones/retirarefectivo", {
+      method: "POST",
+      body: JSON.stringify({ numeroCuenta, monto }),
+    }),
+  consultarSaldo: (numeroCuenta: string) => apiRequest(`/operaciones/saldo/${numeroCuenta}`),
+}
+
 // TRANSACCIONES
 export const transaccionesAPI = {
   getAll: () => apiRequest("/transacciones"),
@@ -174,6 +133,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/deposito", { method: "POST", body: JSON.stringify(data) }),
   retiro: (data: {
     cuentaId: number
@@ -181,6 +141,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/retiro", { method: "POST", body: JSON.stringify(data) }),
   transferencia: (data: {
     cuentaOrigenId: number
@@ -189,6 +150,7 @@ export const transaccionesAPI = {
     cajeroId: number
     sucursalId: number
     descripcion: string
+    fecha: string
   }) => apiRequest("/transacciones/transferencia", { method: "POST", body: JSON.stringify(data) }),
 }
 
@@ -219,12 +181,6 @@ export const rolesAPI = {
 }
 
 // SUCURSALES
-=======
-// API de Sucursales
->>>>>>> Stashed changes
-=======
-// API de Sucursales
->>>>>>> Stashed changes
 export const sucursalesAPI = {
   getAll: () => apiRequest("/sucursales"),
   getById: (id: number) => apiRequest(`/sucursales/${id}`),
@@ -232,44 +188,57 @@ export const sucursalesAPI = {
   getByEstado: (estado: string) => apiRequest(`/sucursales/estado/${estado}`),
   getByTipo: (tipo: string) => apiRequest(`/sucursales/tipo/${tipo}`),
   getByDepartamento: (departamento: string) => apiRequest(`/sucursales/departamento/${departamento}`),
-  create: (sucursal: any) =>
-    apiRequest("/sucursales", {
-      method: "POST",
-      body: JSON.stringify(sucursal),
-    }),
-  update: (id: number, sucursal: any) =>
-    apiRequest(`/sucursales/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(sucursal),
-    }),
-  delete: (id: number) =>
-    apiRequest(`/sucursales/${id}`, {
-      method: "DELETE",
-    }),
+  create: (data: any) => apiRequest("/sucursales", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) => apiRequest(`/sucursales/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: number) => apiRequest(`/sucursales/${id}`, { method: "DELETE" }),
 }
 
-// API de Autenticación
-export const authAPI = {
-  login: (credentials: { username: string; password: string }) =>
-    apiRequest("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(credentials),
-    }),
-  getInfo: () => apiRequest("/auth/info"),
+// TIPOS DE CUENTA
+export const tiposCuentaAPI = {
+  getAll: () => apiRequest("/tipos-cuenta"),
+  getById: (id: number) => apiRequest(`/tipos-cuenta/${id}`),
+  getByNombre: (nombre: string) => apiRequest(`/tipos-cuenta/nombre/${nombre}`),
+  create: (data: any) => apiRequest("/tipos-cuenta", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) => apiRequest(`/tipos-cuenta/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: number) => apiRequest(`/tipos-cuenta/${id}`, { method: "DELETE" }),
 }
 
-// API de Operaciones
-export const operacionesAPI = {
-  getCuentasByDui: (dui: string) => apiRequest(`/operaciones/cuentas/${dui}`),
-  abonarEfectivo: (data: { numeroCuenta: string; monto: number }) =>
-    apiRequest("/operaciones/abonarefectivo", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  retirarEfectivo: (data: { numeroCuenta: string; monto: number }) =>
-    apiRequest("/operaciones/retirarefectivo", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  consultarSaldo: (numeroCuenta: string) => apiRequest(`/operaciones/saldo/${numeroCuenta}`),
+// TIPOS DE TRANSACCIÓN
+export const tiposTransaccionAPI = {
+  getAll: () => apiRequest("/tipos-transaccion"),
+  getById: (id: number) => apiRequest(`/tipos-transaccion/${id}`),
+  getByNombre: (nombre: string) => apiRequest(`/tipos-transaccion/nombre/${nombre}`),
+  create: (data: any) => apiRequest("/tipos-transaccion", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) =>
+    apiRequest(`/tipos-transaccion/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: number) => apiRequest(`/tipos-transaccion/${id}`, { method: "DELETE" }),
+}
+
+// TIPOS DE PRÉSTAMO
+export const tiposPrestamoAPI = {
+  getAll: () => apiRequest("/tipos-prestamo"),
+  getById: (id: number) => apiRequest(`/tipos-prestamo/${id}`),
+  getByNombre: (nombre: string) => apiRequest(`/tipos-prestamo/nombre/${nombre}`),
+  getByGarantia: (requiere: boolean) => apiRequest(`/tipos-prestamo/garantia/${requiere}`),
+  create: (data: any) => apiRequest("/tipos-prestamo", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: number, data: any) => apiRequest(`/tipos-prestamo/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: number) => apiRequest(`/tipos-prestamo/${id}`, { method: "DELETE" }),
+}
+
+// SISTEMA
+export const sistemaAPI = {
+  getInfo: () => apiRequest("/"),
+  getHealth: () => apiRequest("/health"),
+}
+
+// VALIDACIÓN
+export const validacionAPI = {
+  checkInteger: (value: string) => apiRequest(`/validation/check-integer/${value}`),
+  checkDecimal: (value: string) => apiRequest(`/validation/check-decimal/${value}`),
+}
+
+// DOCUMENTACIÓN
+export const documentacionAPI = {
+  getSwaggerUI: () => `${API_BASE_URL}/swagger-ui.html`,
+  getApiDocs: () => apiRequest("/api-docs"),
 }

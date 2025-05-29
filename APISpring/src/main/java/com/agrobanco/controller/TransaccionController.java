@@ -19,26 +19,40 @@ import java.util.Optional;
 public class TransaccionController {
     
     @Autowired
-    private TransaccionService transaccionService;
-    
-    @GetMapping
-    public ResponseEntity<List<Transaccion>> getAllTransacciones() {
+    private TransaccionService transaccionService;    @GetMapping
+    public ResponseEntity<?> getAllTransacciones() {
         try {
             List<Transaccion> transacciones = transaccionService.findAll();
             return ResponseEntity.ok(transacciones);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Error al obtener las transacciones. Posible inconsistencia en los datos.");
+            error.put("error", e.getMessage());
+            error.put("solucion", "Ejecute el endpoint /api/data-fix/diagnostico-transacciones para más información");
+            error.put("timestamp", java.time.LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<Transaccion> getTransaccionById(@PathVariable Integer id) {
+      @GetMapping("/{id}")
+    public ResponseEntity<?> getTransaccionById(@PathVariable Integer id) {
         try {
             Optional<Transaccion> transaccion = transaccionService.findById(id);
-            return transaccion.map(ResponseEntity::ok)
-                            .orElse(ResponseEntity.notFound().build());
+            if (transaccion.isPresent()) {
+                return ResponseEntity.ok(transaccion.get());
+            } else {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Transacción con ID " + id + " no encontrada");
+                error.put("timestamp", java.time.LocalDateTime.now());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Error al obtener la transacción: " + e.getMessage());
+            error.put("timestamp", java.time.LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
     
@@ -52,14 +66,17 @@ public class TransaccionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
-    @GetMapping("/cuenta/{cuentaId}")
-    public ResponseEntity<List<Transaccion>> getTransaccionesByCuenta(@PathVariable Integer cuentaId) {
+      @GetMapping("/cuenta/{cuentaId}")
+    public ResponseEntity<?> getTransaccionesByCuenta(@PathVariable Integer cuentaId) {
         try {
             List<Transaccion> transacciones = transaccionService.findByCuentaId(cuentaId);
             return ResponseEntity.ok(transacciones);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Error al obtener las transacciones de la cuenta: " + e.getMessage());
+            error.put("timestamp", java.time.LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
     

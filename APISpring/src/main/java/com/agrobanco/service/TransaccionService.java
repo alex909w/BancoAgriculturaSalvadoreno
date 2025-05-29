@@ -2,6 +2,7 @@ package com.agrobanco.service;
 
 import com.agrobanco.model.Transaccion;
 import com.agrobanco.model.Cuenta;
+import com.agrobanco.model.TipoTransaccion;
 import com.agrobanco.repository.TransaccionRepository;
 import com.agrobanco.repository.CuentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,38 @@ public class TransaccionService {
     
     @Autowired
     private CuentaRepository cuentaRepository;
-    
-    @Transactional(readOnly = true)
+      @Autowired
+    private TipoTransaccionService tipoTransaccionService;    @Transactional(readOnly = true)
     public List<Transaccion> findAll() {
-        return transaccionRepository.findAll();
+        try {
+            return transaccionRepository.findAllWithRelations();
+        } catch (Exception e) {
+            // Log el error para debugging
+            System.err.println("Error al obtener transacciones con relaciones: " + e.getMessage());
+            
+            // Fallback: obtener transacciones válidas excluyendo las que tienen sucursal_id = 0
+            try {
+                return transaccionRepository.findAllValidTransactions();
+            } catch (Exception fallbackException) {
+                // Si también falla el fallback, usar consulta básica
+                List<Transaccion> transacciones = transaccionRepository.findAll();
+                // Filtrar transacciones con sucursal nula o inválida
+                return transacciones.stream()
+                    .filter(t -> {
+                        try {
+                            // Verificar que la sucursal sea accesible
+                            return t.getSucursal() != null && t.getSucursal().getId() != null && t.getSucursal().getId() > 0;
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+            }
+        }
     }
-    
     @Transactional(readOnly = true)
     public Optional<Transaccion> findById(Integer id) {
-        return transaccionRepository.findById(id);
+        return transaccionRepository.findByIdWithRelations(id);
     }
     
     @Transactional(readOnly = true)
@@ -40,7 +64,7 @@ public class TransaccionService {
     
     @Transactional(readOnly = true)
     public List<Transaccion> findByCuentaId(Integer cuentaId) {
-        return transaccionRepository.findByCuentaId(cuentaId);
+        return transaccionRepository.findByCuentaIdWithRelations(cuentaId);
     }
     
     @Transactional(readOnly = true)
@@ -52,8 +76,7 @@ public class TransaccionService {
     public List<Transaccion> findBySucursalId(Integer sucursalId) {
         return transaccionRepository.findBySucursalId(sucursalId);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarDeposito(Integer cuentaId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta
         Cuenta cuenta = cuentaRepository.findById(cuentaId)
@@ -63,9 +86,14 @@ public class TransaccionService {
             throw new RuntimeException("La cuenta no está activa");
         }
         
+        // Obtener tipo de transacción para depósito
+        TipoTransaccion tipoDeposito = tipoTransaccionService.findByNombre("Depósito")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Depósito' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoDeposito);
         transaccion.setCuentaOrigen(cuenta);
         transaccion.setMonto(monto);
         transaccion.setComision(BigDecimal.ZERO);
@@ -80,8 +108,7 @@ public class TransaccionService {
         
         return transaccionRepository.save(transaccion);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarRetiro(Integer cuentaId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta
         Cuenta cuenta = cuentaRepository.findById(cuentaId)
@@ -96,9 +123,14 @@ public class TransaccionService {
             throw new RuntimeException("Saldo insuficiente");
         }
         
+        // Obtener tipo de transacción para retiro
+        TipoTransaccion tipoRetiro = tipoTransaccionService.findByNombre("Retiro")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Retiro' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoRetiro);
         transaccion.setCuentaOrigen(cuenta);
         transaccion.setMonto(monto);
         transaccion.setComision(BigDecimal.valueOf(1.00)); // Comisión por retiro
@@ -114,8 +146,7 @@ public class TransaccionService {
         
         return transaccionRepository.save(transaccion);
     }
-    
-    @Transactional
+      @Transactional
     public Transaccion realizarTransferencia(Integer cuentaOrigenId, Integer cuentaDestinoId, BigDecimal monto, Integer cajeroId, Integer sucursalId, String descripcion) {
         // Validar cuenta origen
         Cuenta cuentaOrigen = cuentaRepository.findById(cuentaOrigenId)
@@ -141,9 +172,14 @@ public class TransaccionService {
             throw new RuntimeException("Saldo insuficiente para realizar la transferencia");
         }
         
+        // Obtener tipo de transacción para transferencia
+        TipoTransaccion tipoTransferencia = tipoTransaccionService.findByNombre("Transferencia")
+                .orElseThrow(() -> new RuntimeException("Tipo de transacción 'Transferencia' no encontrado"));
+        
         // Crear transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setNumeroTransaccion(generarNumeroTransaccion());
+        transaccion.setTipoTransaccion(tipoTransferencia);
         transaccion.setCuentaOrigen(cuentaOrigen);
         transaccion.setCuentaDestino(cuentaDestino);
         transaccion.setMonto(monto);

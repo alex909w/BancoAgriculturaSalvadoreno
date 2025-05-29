@@ -2,6 +2,7 @@ package com.agrobanco.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,8 +16,35 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+      @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Bad Request");
+        
+        String message = "Cuerpo de la petición requerido está ausente o mal formateado";
+        
+        // Verificar si es un problema de JSON malformado
+        String exMessage = ex.getMessage();
+        if (exMessage != null) {
+            if (exMessage.contains("JSON")) {
+                message = "El cuerpo de la petición contiene JSON malformado. Verifique la sintaxis.";
+            } else if (exMessage.contains("Required request body is missing")) {
+                message = "El cuerpo de la petición es requerido. Asegúrese de enviar los datos en formato JSON.";
+            }
+        }
+        
+        response.put("message", message);
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+        response.put("esperado", "{ \"username\": \"usuario\", \"password\": \"contraseña\" }");
+        
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+      @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
         
@@ -25,15 +53,18 @@ public class GlobalExceptionHandler {
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("error", "Bad Request");
+          String value = (ex.getValue() != null) ? ex.getValue().toString() : "null";
+        String paramName = (ex.getName() != null) ? ex.getName() : "desconocido";
+        Class<?> requiredType = ex.getRequiredType();
+        String expectedType = (requiredType != null) ? requiredType.getSimpleName() : "desconocido";
         
-        String value = ex.getValue() != null ? ex.getValue().toString() : "null";
         String message = String.format("El valor '%s' no es válido para el parámetro '%s'. Se esperaba un tipo %s",
-                value, ex.getName(), ex.getRequiredType().getSimpleName());
+                value, paramName, expectedType);
         
         // Mensaje específico para 'undefined'
         if ("undefined".equals(value)) {
             message = String.format("El parámetro '%s' tiene un valor no definido. Por favor, proporcione un valor válido de tipo %s",
-                    ex.getName(), ex.getRequiredType().getSimpleName());
+                    paramName, expectedType);
         }
         
         response.put("message", message);
@@ -94,8 +125,7 @@ public class GlobalExceptionHandler {
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    
-    @ExceptionHandler(Exception.class)
+      @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(
             Exception ex, WebRequest request) {
         
@@ -109,6 +139,7 @@ public class GlobalExceptionHandler {
         response.put("path", request.getDescription(false).replace("uri=", ""));
         
         // Log del error para debugging
+        System.err.println("Error interno del servidor: " + ex.getMessage());
         ex.printStackTrace();
         
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);

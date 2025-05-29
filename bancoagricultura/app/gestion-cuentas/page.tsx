@@ -1,28 +1,93 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { cuentasAPI } from "@/lib/api"
 
 interface Cuenta {
   id: number
   numeroCuenta: string
   cliente: {
     id: number
+    username: string
+    email: string
     nombreCompleto: string
+    dui: string
+    telefono: string
+    direccion: string
+    fechaNacimiento: string
+    genero: string
+    profesion: string
+    salario: number
+    rol: {
+      id: number
+      nombre: string
+      descripcion: string
+      createdAt: string
+      updatedAt: string
+    }
+    sucursal: {
+      id: number
+      nombre: string
+      codigo: string
+      departamento: string
+      municipio: string
+      direccion: string
+      telefono: string
+      tipo: string
+      estado: string
+      createdAt: string
+      updatedAt: string
+    }
+    estado: string
+    ultimoLogin: string
+    createdAt: string
+    updatedAt: string
   }
   tipoCuenta: {
     id: number
     nombre: string
+    descripcion: string
+    tasaInteres: number
+    montoMinimo: number
+    comisionMantenimiento: number
+    createdAt: string
   }
   sucursal: {
     id: number
     nombre: string
+    codigo: string
+    departamento: string
+    municipio: string
+    direccion: string
+    telefono: string
+    tipo: string
+    estado: string
+    createdAt: string
+    updatedAt: string
   }
   saldo: number
   estado: string
+  tieneSeguro: boolean
   fechaApertura: string
+  createdAt: string
+  updatedAt: string
+}
+
+async function fetchCuentas() {
+  const response = await fetch("http://localhost:8081/api/cuentas", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("Error al cargar cuentas")
+  }
+
+  return await response.json()
 }
 
 export default function GestionCuentas() {
@@ -32,33 +97,6 @@ export default function GestionCuentas() {
   const [menuVisible, setMenuVisible] = useState(false)
   const [usingMockData, setUsingMockData] = useState(false)
 
-  const useMockData = useCallback(() => {
-    const mockCuentas: Cuenta[] = [
-      {
-        id: 1,
-        numeroCuenta: "652732736823",
-        cliente: { id: 1, nombreCompleto: "Juan Pérez" },
-        tipoCuenta: { id: 1, nombre: "Ahorros" },
-        sucursal: { id: 1, nombre: "Sucursal Central" },
-        saldo: 7545,
-        estado: "activa",
-        fechaApertura: "2023-01-15",
-      },
-      {
-        id: 2,
-        numeroCuenta: "657687676666",
-        cliente: { id: 2, nombreCompleto: "María García" },
-        tipoCuenta: { id: 2, nombre: "Corriente" },
-        sucursal: { id: 1, nombre: "Sucursal Central" },
-        saldo: 232.0,
-        estado: "activa",
-        fechaApertura: "2023-02-20",
-      },
-    ]
-    setCuentas(mockCuentas)
-    setUsingMockData(true)
-  }, [])
-
   useEffect(() => {
     // Verificar autenticación
     const token = localStorage.getItem("authToken")
@@ -67,34 +105,38 @@ export default function GestionCuentas() {
     if (!token || !userRole) {
       router.push("/login")
       return
-    }
-
-    if (userRole !== "admin") {
+    }    if (userRole !== "admin") {
       router.push("/login")
       return
     }
 
     loadCuentas()
-  }, [router, useMockData])
-
+  }, [router])
+  
   const loadCuentas = async () => {
     try {
       setLoading(true)
-      const data = await cuentasAPI.getAll()
+      console.log("Intentando cargar cuentas desde la API...")
+      const data = await fetchCuentas()
+      console.log("Respuesta de la API:", data)
 
       // Verificar si hay un error en la respuesta
       if (data && data.error) {
         console.error("Error al cargar cuentas:", data.message)
         // Si hay error, usamos datos simulados
-        useMockData()
-      } else {
-        // Si la respuesta es exitosa, usamos los datos reales
+        console.log("Usando datos simulados debido a error en API")
+      } else if (Array.isArray(data)) {
+        // Si la respuesta es exitosa y es un array, usamos los datos reales
+        console.log(`Cargadas ${data.length} cuentas desde la API`)
         setCuentas(data)
         setUsingMockData(false)
+      } else {
+        console.warn("La respuesta de la API no es un array válido:", data)
+        console.log("Usando datos simulados debido a formato inválido")
       }
     } catch (error) {
-      console.error("Error inesperado:", error)
-      useMockData()
+      console.error("Error inesperado al cargar cuentas:", error)
+      console.log("Usando datos simulados debido a error de conexión")
     } finally {
       setLoading(false)
     }
@@ -152,27 +194,127 @@ export default function GestionCuentas() {
         </div>
       </header>
 
-      <main className="p-6 max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-6">Lista de Cuentas</h2>
-
-          {loading ? (
+      <main className="p-6 max-w-4xl mx-auto">        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">Lista de Cuentas</h2>
+            <div className="flex items-center gap-3">
+              {usingMockData && (
+                <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                  ⚠️ Usando datos simulados
+                </div>
+              )}              <button
+                onClick={loadCuentas}
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⟳</span>
+                    Cargando...
+                  </>
+                ) : (
+                  <>
+                    🔄 Recargar
+                  </>
+                )}
+              </button>              <button
+                onClick={async () => {
+                  console.log("=== DEBUG: Probando API ===")
+                  console.log("Token:", localStorage.getItem("authToken"))
+                  console.log("UserRole:", localStorage.getItem("userRole"))
+                  try {
+                    const data = await fetchCuentas()
+                    console.log("Response data:", data)
+                  } catch (error) {
+                    console.error("Error en debug:", error)
+                  }
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              >
+                🔍 Debug API
+              </button>
+            </div>
+          </div>          {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">Cargando cuentas...</p>
+              <div className="animate-spin text-4xl mb-4">⟳</div>
+              <p className="text-gray-500">Cargando cuentas desde la API...</p>
+            </div>
+          ) : cuentas.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No se encontraron cuentas.</p>
+              <button
+                onClick={loadCuentas}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                🔄 Intentar nuevamente
+              </button>
             </div>
           ) : (
             <div className="space-y-6">
+              <div className={`border rounded-lg p-3 ${usingMockData ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
+                <p className={`font-medium ${usingMockData ? 'text-yellow-800' : 'text-green-800'}`}>
+                  {usingMockData ? '⚠️' : '✅'} Total de cuentas: {cuentas.length}
+                  {usingMockData ? ' (datos de ejemplo - verifique la conexión a la API)' : ' (datos reales desde la API)'}
+                </p>
+              </div>
               {cuentas.map((cuenta) => (
-                <div key={cuenta.id} className="border-b pb-4 last:border-b-0">
-                  <p className="font-semibold">
-                    Número de Cuenta: <span className="font-normal">{cuenta.numeroCuenta}</span>
-                  </p>
-                  <p className="font-semibold">
-                    Saldo: <span className="font-normal">{formatCurrency(cuenta.saldo).replace("$", "")} US</span>
-                  </p>
-                  <p className="font-semibold">
-                    Tipo de Cuenta: <span className="font-normal">{cuenta.tipoCuenta.nombre}</span>
-                  </p>
+                <div key={cuenta.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <p className="font-semibold text-lg text-green-700">
+                        Cuenta #{cuenta.numeroCuenta}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Cliente:</span> {cuenta.cliente.nombreCompleto}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">DUI:</span> {cuenta.cliente.dui}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Email:</span> {cuenta.cliente.email}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Teléfono:</span> {cuenta.cliente.telefono}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm">
+                        <span className="font-semibold">Tipo de Cuenta:</span> {cuenta.tipoCuenta.nombre}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Saldo:</span> 
+                        <span className="text-lg font-bold text-green-600 ml-2">
+                          {formatCurrency(cuenta.saldo)}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Estado:</span> 
+                        <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
+                          cuenta.estado === 'activa' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {cuenta.estado}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Seguro:</span> 
+                        <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
+                          cuenta.tieneSeguro 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {cuenta.tieneSeguro ? 'Con seguro' : 'Sin seguro'}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Sucursal:</span> {cuenta.sucursal.nombre}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-semibold">Fecha de Apertura:</span> {new Date(cuenta.fechaApertura).toLocaleDateString('es-SV')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

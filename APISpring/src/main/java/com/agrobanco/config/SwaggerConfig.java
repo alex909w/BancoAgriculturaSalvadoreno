@@ -1,14 +1,15 @@
 package com.agrobanco.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -18,9 +19,8 @@ public class SwaggerConfig {
         Server server = new Server();
         server.setUrl("http://localhost:8080/api");
         server.setDescription("Servidor de desarrollo");
-        
         return new OpenAPI()
-                .servers(List.of(server))
+                .servers(Arrays.asList(server))
                 .info(new Info()
                         .title("AgroBanco Salvadoreño API")
                         .description("API REST para el sistema bancario de AgroBanco Salvadoreño. " +

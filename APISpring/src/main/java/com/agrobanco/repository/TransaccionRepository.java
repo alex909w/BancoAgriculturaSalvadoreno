@@ -30,7 +30,42 @@ public interface TransaccionRepository extends JpaRepository<Transaccion, Intege
     
     @Query("SELECT t FROM Transaccion t WHERE t.sucursal.id = :sucursalId ORDER BY t.fechaTransaccion DESC")
     List<Transaccion> findBySucursalId(@Param("sucursalId") Integer sucursalId);
+      @Query("SELECT t FROM Transaccion t WHERE t.cajero.id = :cajeroId ORDER BY t.fechaTransaccion DESC")
+    List<Transaccion> findByCajeroId(@Param("cajeroId") Integer cajeroId);    @Query("SELECT DISTINCT t FROM Transaccion t " +
+           "LEFT JOIN FETCH t.tipoTransaccion " +
+           "LEFT JOIN FETCH t.cuentaOrigen " +
+           "LEFT JOIN FETCH t.cuentaDestino " +
+           "LEFT JOIN FETCH t.cajero " +
+           "LEFT JOIN FETCH t.sucursal " +
+           "ORDER BY t.fechaTransaccion DESC")
+    List<Transaccion> findAllWithRelations();
     
-    @Query("SELECT t FROM Transaccion t WHERE t.cajero.id = :cajeroId ORDER BY t.fechaTransaccion DESC")
-    List<Transaccion> findByCajeroId(@Param("cajeroId") Integer cajeroId);
+    @Query("SELECT DISTINCT t FROM Transaccion t " +
+           "LEFT JOIN FETCH t.tipoTransaccion " +
+           "LEFT JOIN FETCH t.cuentaOrigen " +
+           "LEFT JOIN FETCH t.cuentaDestino " +
+           "LEFT JOIN FETCH t.cajero " +
+           "LEFT JOIN FETCH t.sucursal " +
+           "WHERE t.sucursal.id > 0 " +
+           "ORDER BY t.fechaTransaccion DESC")
+    List<Transaccion> findAllValidTransactions();
+    
+    @Query("SELECT t FROM Transaccion t " +
+           "LEFT JOIN FETCH t.tipoTransaccion " +
+           "LEFT JOIN FETCH t.cuentaOrigen " +
+           "LEFT JOIN FETCH t.cuentaDestino " +
+           "LEFT JOIN FETCH t.cajero " +
+           "LEFT JOIN FETCH t.sucursal " +
+           "WHERE t.id = :id")
+    Optional<Transaccion> findByIdWithRelations(@Param("id") Integer id);
+    
+    @Query("SELECT t FROM Transaccion t " +
+           "LEFT JOIN FETCH t.tipoTransaccion " +
+           "LEFT JOIN FETCH t.cuentaOrigen " +
+           "LEFT JOIN FETCH t.cuentaDestino " +
+           "LEFT JOIN FETCH t.cajero " +
+           "LEFT JOIN FETCH t.sucursal " +
+           "WHERE (t.cuentaOrigen.id = :cuentaId OR t.cuentaDestino.id = :cuentaId) " +
+           "ORDER BY t.fechaTransaccion DESC")
+    List<Transaccion> findByCuentaIdWithRelations(@Param("cuentaId") Integer cuentaId);
 }

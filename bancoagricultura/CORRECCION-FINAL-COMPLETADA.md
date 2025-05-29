@@ -7,7 +7,7 @@
 **PROBLEMA**: La página estaba enviando una estructura de datos incorrecta al endpoint del backend.
 
 **ESTRUCTURA INCORRECTA (Antes):**
-\`\`\`json
+```json
 {
   "numero": "1748468905884XXXX",
   "saldo": 0.0,
@@ -17,10 +17,10 @@
   "sucursalId": 1,
   "tipoCuentaId": 1
 }
-\`\`\`
+```
 
 **ESTRUCTURA CORRECTA (Después):**
-\`\`\`json
+```json
 {
   "cliente": {"id": 2},
   "tipoCuenta": {"id": 1},
@@ -28,7 +28,7 @@
   "saldo": 100.0,
   "tieneSeguro": true
 }
-\`\`\`
+```
 
 ---
 
@@ -43,7 +43,7 @@
 - Agregado `tieneSeguro` basado en checkbox del formulario
 
 ### 2. **Función handleSubmit Actualizada** ✅
-\`\`\`typescript
+```typescript
 const cuentaData = {
   cliente: { id: clienteIdNumero },
   tipoCuenta: { id: Number.parseInt(formData.tipoCuentaId) },
@@ -51,24 +51,24 @@ const cuentaData = {
   saldo: 0.0,
   tieneSeguro: formData.agregarSeguro
 }
-\`\`\`
+```
 
 ### 3. **Manejo de Respuesta Mejorado** ✅
-\`\`\`typescript
+```typescript
 const numeroCuenta = response.cuenta?.numeroCuenta || response.numeroCuenta || "Generado automáticamente"
-\`\`\`
+```
 
 ---
 
 ## 🧪 Pruebas de Validación Completadas
 
 ### ✅ Prueba de API Exitosa
-\`\`\`powershell
+```powershell
 POST http://localhost:8081/api/cuentas
 Body: {"cliente":{"id":2},"tipoCuenta":{"id":1},"sucursal":{"id":1},"saldo":100.0,"tieneSeguro":true}
 Resultado: 201 Created ✅
 Respuesta: {"success":true,"cuenta":{"id":18,"numeroCuenta":"4036889634",...}}
-\`\`\`
+```
 
 ### ✅ Funcionalidades Verificadas
 1. **Conexión API**: ✅ Backend responde correctamente

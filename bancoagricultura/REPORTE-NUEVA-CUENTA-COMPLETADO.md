@@ -45,7 +45,7 @@ La página `nueva-cuenta-cliente` ha sido **completamente reparada** y ahora est
 ## 🏗️ Estructura Técnica Implementada
 
 ### Interfaces TypeScript
-\`\`\`typescript
+```typescript
 interface TipoCuenta {
   id: number
   nombre: string
@@ -71,7 +71,7 @@ interface UserData {
   telefono?: string
   cuentasEnPosesion?: number
 }
-\`\`\`
+```
 
 ### Funciones Principales
 - `loadInitialData()`: Carga paralela de todos los datos necesarios
@@ -85,7 +85,7 @@ interface UserData {
 ## 🔗 Integración con Backend
 
 ### Endpoint Principal de Creación
-\`\`\`javascript
+```javascript
 POST http://localhost:8081/api/cuentas
 Content-Type: application/json
 
@@ -98,7 +98,7 @@ Content-Type: application/json
   "sucursalId": 1,
   "tipoCuentaId": 1
 }
-\`\`\`
+```
 
 ### Endpoints Utilizados
 - `GET /api/tipos-cuenta` - Obtener tipos de cuenta
