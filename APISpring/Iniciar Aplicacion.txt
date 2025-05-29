@@ -1,0 +1,7 @@
+# En la carpeta del proyecto, ejecutar:
+
+Descargar Mave en formato zip y colocar la carpeta en C:\
+y agregar a la variable de entrono PATH 
+
+mvn clean install
+mvn spring-boot:run

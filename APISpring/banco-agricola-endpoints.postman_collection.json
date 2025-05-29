@@ -1,0 +1,232 @@
+{
+  "info": {
+    "name": "Banco Agrícola API",
+    "description": "Colección de endpoints para la API del Banco Agrícola",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"jlopez\",\n  \"password\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "login"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar Contraseña",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"1234\",\n  \"newPassword\": \"nuevaPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1/password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1", "password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Obtener Todos los Usuarios",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Usuario por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"nuevoUsuario\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Obtener Todos los Clientes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Cliente por DUI",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/clientes/dui/12345678-9",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clientes", "dui", "12345678-9"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cuentas",
+      "item": [
+        {
+          "name": "Obtener Cuentas de Cliente",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/cuentas/cliente/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cuentas", "cliente", "1"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Cuenta por Número",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/cuentas/numero/0012345678",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cuentas", "numero", "0012345678"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Movimientos",
+      "item": [
+        {
+          "name": "Realizar Depósito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCuenta\": 1,\n  \"monto\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/movimientos/deposito",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimientos", "deposito"]
+            }
+          }
+        },
+        {
+          "name": "Realizar Retiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCuenta\": 1,\n  \"monto\": 50.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/movimientos/retiro",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimientos", "retiro"]
+            }
+          }
+        },
+        {
+          "name": "Realizar Transferencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaOrigen\": 1,\n  \"cuentaDestino\": 2,\n  \"monto\": 75.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/movimientos/transferencia",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimientos", "transferencia"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    }
+  ]
+}
