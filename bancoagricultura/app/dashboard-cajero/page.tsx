@@ -1,44 +1,82 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
+import Image from "next/image"
 
 export default function DashboardCajero() {
   const router = useRouter()
   const [menuVisible, setMenuVisible] = useState(false)
 
+  useEffect(() => {
+    // Verificar autenticación
+    const token = localStorage.getItem("authToken")
+    const userRole = localStorage.getItem("userRole")
+    const username = localStorage.getItem("username")
+
+    console.log("Token:", token)
+    console.log("Role:", userRole)
+    console.log("Username:", username)
+
+    if (!token || !userRole) {
+      console.log("No hay token o rol, redirigiendo a login")
+      router.push("/login")
+      return
+    }
+
+    if (userRole !== "cajero") {
+      console.log("El usuario no es cajero, redirigiendo a login")
+      router.push("/login")
+      return
+    }
+  }, [router])
+
   const handleLogout = () => {
+    localStorage.removeItem("authToken")
+    localStorage.removeItem("userRole")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userId")
     router.push("/login")
+  }
+
+  const handleNavigate = (path: string) => {
+    router.push(path)
   }
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible)
   }
-
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
-        <div className="flex items-center">
-          <img src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="h-12" />
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-green-600 p-4 flex items-center justify-between">
+        <div className="w-16 h-16 relative">
+          <Image src="/imagenes/logo.png" alt="AgroBanco Salvadoreño Logo" fill className="object-cover" />
         </div>
-        <h1 className="text-xl font-bold text-green-700">Cajero</h1>
-        <div className="relative">
-          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200" onClick={toggleMenu}>
-            <img src="/imagenes/Usuario.png" alt="Usuario" className="w-8 h-8 rounded-full" />
+        <h1 className="text-white text-xl font-bold">Panel de Cajero</h1>
+        <div className="relative">          <button
+            className="w-16 h-16 rounded-full overflow-hidden bg-gray-400 cursor-pointer border-0 p-0"
+            onClick={toggleMenu}
+            title="Menú de usuario"
+          >
+            <Image src="/imagenes/Usuario.png" alt="Usuario" fill className="object-cover" />
           </button>
-
           {menuVisible && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-              <Link href="/perfil-cajero" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Perfil
-              </Link>
-              <Link href="/configuracion-cajero" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Configuración
-              </Link>
+            <div className="absolute right-0 bg-white rounded-lg shadow-md p-2 flex flex-col z-10">
               <button
+                className="bg-none border-0 p-2 cursor-pointer text-left hover:bg-gray-100"
+                onClick={() => handleNavigate("/perfil-cajero")}
+              >
+                Perfil
+              </button>
+              <button
+                className="bg-none border-0 p-2 cursor-pointer text-left hover:bg-gray-100"
+                onClick={() => handleNavigate("/configuracion-cajero")}
+              >
+                Configuración
+              </button>
+              <button
+                className="bg-none border-0 p-2 cursor-pointer text-left hover:bg-gray-100"
                 onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Cerrar Sesión
               </button>
@@ -47,36 +85,39 @@ export default function DashboardCajero() {
         </div>
       </header>
 
-      <main className="flex-1 p-6">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 flex flex-col items-center">
-          <img src="/imagenes/cajero.png" alt="Selecciona una acción" className="w-32 h-32 mb-4" />
-          <p className="text-xl text-gray-700 mb-4">Selecciona qué tipo de movimiento quieres realizar</p>
+      <main className="p-6 max-w-6xl mx-auto">
+        <div className="bg-white p-8 rounded-lg shadow-md text-center mb-8">
+          <Image
+            src="/imagenes/cajero.png"
+            alt="Icono de Cajero"
+            width={200}
+            height={190}
+            className="mx-auto mb-4"
+          />
+          <p className="text-2xl">Selecciona una opción</p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <button
-            className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center hover:bg-gray-50 transition-colors"
-            onClick={() => router.push("/crear-cliente")}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            className="bg-white p-6 rounded-lg shadow-md cursor-pointer text-center hover:shadow-lg transition-shadow"
+            onClick={() => handleNavigate("/crear-cliente")}
           >
-            <img src="/imagenes/nuevo-usuario.png" alt="Registrar Nuevo Cliente" className="w-20 h-20 mb-4" />
-            <span className="text-lg font-medium text-gray-800 text-center">REGISTRAR NUEVO CLIENTE</span>
-          </button>
-
-          <button
-            className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center hover:bg-gray-50 transition-colors"
-            onClick={() => router.push("/prestamos")}
+            <h3 className="text-lg font-bold mb-2 text-green-600">Registrar Nuevo Cliente</h3>
+            <p className="text-gray-600">Crear una nueva cuenta de cliente</p>
+          </div>
+          <div
+            className="bg-white p-6 rounded-lg shadow-md cursor-pointer text-center hover:shadow-lg transition-shadow"
+            onClick={() => handleNavigate("/prestamos")}
           >
-            <img src="/imagenes/deposito.png" alt="Prestamos" className="w-20 h-20 mb-4" />
-            <span className="text-lg font-medium text-gray-800 text-center">PRÉSTAMOS</span>
-          </button>
-
-          <button
-            className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center hover:bg-gray-50 transition-colors"
-            onClick={() => router.push("/transaccion")}
+            <h3 className="text-lg font-bold mb-2 text-green-600">Préstamos</h3>
+            <p className="text-gray-600">Gestionar préstamos</p>
+          </div>
+          <div
+            className="bg-white p-6 rounded-lg shadow-md cursor-pointer text-center hover:shadow-lg transition-shadow"
+            onClick={() => handleNavigate("/transaccion")}
           >
-            <img src="/imagenes/transaccion.png" alt="Transacción" className="w-20 h-20 mb-4" />
-            <span className="text-lg font-medium text-gray-800 text-center">TRANSACCIÓN</span>
-          </button>
+            <h3 className="text-lg font-bold mb-2 text-green-600">Transacciones</h3>
+            <p className="text-gray-600">Realizar transacciones</p>
+          </div>
         </div>
       </main>
     </div>

@@ -30,11 +30,11 @@ export default function DashboardAdminPage() {
       return
     }
   }, [router])
-
   const handleLogout = () => {
     localStorage.removeItem("authToken")
     localStorage.removeItem("userRole")
     localStorage.removeItem("username")
+    localStorage.removeItem("userId")
     router.push("/login")
   }
 
@@ -55,8 +55,10 @@ export default function DashboardAdminPage() {
         <h1 className="text-white text-xl font-bold">Panel de Administrador</h1>
         <div className="relative">
           <button
+            type="button"
             className="w-16 h-16 rounded-full overflow-hidden bg-gray-400 cursor-pointer border-0 p-0"
             onClick={toggleMenu}
+            aria-label="Abrir menú de usuario"
           >
             <Image src="/imagenes/Usuario.png" alt="Usuario" fill className="object-cover" />
           </button>
