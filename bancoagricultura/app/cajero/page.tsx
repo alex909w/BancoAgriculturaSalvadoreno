@@ -20,12 +20,14 @@ export default function CajeroPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white shadow-md p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="h-12" />
+          <div className="h-12 w-32 bg-green-600 text-white flex items-center justify-center rounded">
+            AgroBanco Logo
+          </div>
         </div>
 
         <div className="relative">
           <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200" onClick={toggleMenu}>
-            <img src="/imagenes/Usuario.png" alt="Usuario" className="w-8 h-8 rounded-full" />
+            <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white">U</div>
           </button>
 
           {menuVisible && (
@@ -52,11 +54,9 @@ export default function CajeroPage() {
 
         <div className="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row gap-8">
           <div className="flex-1 flex justify-center">
-            <img
-              src="/imagenes/customer-service.png"
-              alt="Servicio al cliente"
-              className="max-w-full h-auto max-h-80"
-            />
+            <div className="w-full max-w-md h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+              <span className="text-gray-500">Imagen de Servicio al Cliente</span>
+            </div>
           </div>
 
           <div className="flex-1">
