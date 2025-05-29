@@ -2,322 +2,243 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
+import Image from "next/image"
+import { transaccionesAPI, cuentasAPI, tiposTransaccionAPI, usuariosAPI, sucursalesAPI } from "@/lib/api"
 
+// Definimos interfaces para los tipos de datos que manejaremos
 interface Transaccion {
   id: number
-  numero_transaccion: string
-  tipo_transaccion: {
+  numeroTransaccion: string
+  tipoTransaccion: {
     id: number
     nombre: string
-    descripcion: string
-    requiere_cuenta_destino: boolean
-    comision: number
   }
-  cuenta_origen: {
+  cuentaOrigen?: {
     id: number
-    numero_cuenta: string
-    cliente: {
-      nombre_completo: string
-      dui: string
-    }
-    tipo_cuenta: {
-      nombre: string
-    }
+    numeroCuenta: string
   }
-  cuenta_destino?: {
+  cuentaDestino?: {
     id: number
-    numero_cuenta: string
-    cliente: {
-      nombre_completo: string
-      dui: string
-    }
+    numeroCuenta: string
   }
   monto: number
-  comision: number
-  descripcion?: string
-  estado: string
+  fecha: string
+  descripcion: string
+  cajero?: {
+    id: number
+    nombreCompleto: string
+  }
   sucursal: {
     id: number
     nombre: string
-    codigo: string
-  }
-  fecha_transaccion: string
-  cajero?: {
-    id: number
-    nombre_completo: string
   }
 }
 
 interface Cuenta {
   id: number
-  numero_cuenta: string
+  numeroCuenta: string
   cliente: {
-    nombre_completo: string
+    id: number
+    nombreCompleto: string
     dui: string
   }
-  tipo_cuenta: {
-    nombre: string
-  }
-  saldo: number
-  estado: string
-  fecha_apertura: string
-  sucursal: {
+}
+
+interface TipoTransaccion {
+  id: number
+  nombre: string
+  descripcion: string
+}
+
+interface Usuario {
+  id: number
+  username: string
+  nombreCompleto: string
+  rol: {
     nombre: string
   }
 }
 
-export default function MovimientosPage() {
+interface Sucursal {
+  id: number
+  nombre: string
+  codigo: string
+  direccion: string
+}
+
+interface Filtros {
+  tipoTransaccion: string
+  sucursal: string
+  fechaInicio: string
+  fechaFin: string
+  numeroCuenta: string
+  usuario: string
+}
+
+export default function Movimientos() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("transacciones")
+  const [menuVisible, setMenuVisible] = useState(false)
   const [transacciones, setTransacciones] = useState<Transaccion[]>([])
   const [cuentas, setCuentas] = useState<Cuenta[]>([])
-  const [loading, setLoading] = useState(true)
-  const [menuVisible, setMenuVisible] = useState(false)
-  const [filtroFecha, setFiltroFecha] = useState("")
-  const [filtroTipo, setFiltroTipo] = useState("")
-  const [filtroMonto, setFiltroMonto] = useState("")
-
+  const [tiposTransacciones, setTiposTransacciones] = useState<TipoTransaccion[]>([])
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [sucursales, setSucursales] = useState<Sucursal[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [filtros, setFiltros] = useState<Filtros>({
+    tipoTransaccion: "",
+    sucursal: "",
+    fechaInicio: "",
+    fechaFin: "",
+    numeroCuenta: "",
+    usuario: ""
+  })
   useEffect(() => {
     // Verificar autenticación
-    const token = localStorage.getItem("authToken")
-    const userRole = localStorage.getItem("userRole")
-
-    if (!token || !userRole) {
-      router.push("/login")
-      return
-    }
-
-    if (userRole !== "gerente") {
-      router.push("/login")
-      return
-    }
-
-    loadData()
-  }, [router])
-
-  const loadData = async () => {
     try {
-      setLoading(true)
-      console.log("Cargando movimientos y cuentas...")
+      const token = typeof window !== 'undefined' ? localStorage.getItem("authToken") : null
+      const role = typeof window !== 'undefined' ? localStorage.getItem("userRole") : null
+      
+      if (!token) {
+        console.log("No hay token, redirigiendo a login")
+        router.push("/login")
+        return
+      }
 
-      // Datos basados en la estructura real de la BD
-      const mockTransacciones: Transaccion[] = [
-        {
-          id: 1,
-          numero_transaccion: "TXN-2025-001",
-          tipo_transaccion: {
-            id: 1,
-            nombre: "Depósito",
-            descripcion: "Depósito en efectivo",
-            requiere_cuenta_destino: false,
-            comision: 0.0,
-          },
-          cuenta_origen: {
-            id: 1,
-            numero_cuenta: "652732736823",
-            cliente: {
-              nombre_completo: "Cliente",
-              dui: "046765789",
-            },
-            tipo_cuenta: {
-              nombre: "Ahorros",
-            },
-          },
-          monto: 500.0,
-          comision: 0.0,
-          descripcion: "Depósito en efectivo",
-          estado: "completada",
-          sucursal: {
-            id: 1,
-            nombre: "Sucursal Central",
-            codigo: "SC001",
-          },
-          fecha_transaccion: "2025-01-28T10:30:00Z",
-          cajero: {
-            id: 3,
-            nombre_completo: "Cajero",
-          },
-        },
-        {
-          id: 2,
-          numero_transaccion: "TXN-2025-002",
-          tipo_transaccion: {
-            id: 2,
-            nombre: "Retiro",
-            descripcion: "Retiro en efectivo",
-            requiere_cuenta_destino: false,
-            comision: 1.0,
-          },
-          cuenta_origen: {
-            id: 2,
-            numero_cuenta: "57687676666",
-            cliente: {
-              nombre_completo: "Cliente",
-              dui: "046765789",
-            },
-            tipo_cuenta: {
-              nombre: "Corriente",
-            },
-          },
-          monto: 200.0,
-          comision: 1.0,
-          descripcion: "Retiro en efectivo",
-          estado: "completada",
-          sucursal: {
-            id: 1,
-            nombre: "Sucursal Central",
-            codigo: "SC001",
-          },
-          fecha_transaccion: "2025-01-28T14:15:00Z",
-          cajero: {
-            id: 3,
-            nombre_completo: "Cajero",
-          },
-        },
-        {
-          id: 3,
-          numero_transaccion: "TXN-2025-003",
-          tipo_transaccion: {
-            id: 3,
-            nombre: "Transferencia",
-            descripcion: "Transferencia entre cuentas",
-            requiere_cuenta_destino: true,
-            comision: 2.5,
-          },
-          cuenta_origen: {
-            id: 1,
-            numero_cuenta: "652732736823",
-            cliente: {
-              nombre_completo: "Cliente",
-              dui: "046765789",
-            },
-            tipo_cuenta: {
-              nombre: "Ahorros",
-            },
-          },
-          cuenta_destino: {
-            id: 2,
-            numero_cuenta: "57687676666",
-            cliente: {
-              nombre_completo: "Cliente",
-              dui: "046765789",
-            },
-          },
-          monto: 300.0,
-          comision: 2.5,
-          descripcion: "Transferencia entre cuentas propias",
-          estado: "completada",
-          sucursal: {
-            id: 1,
-            nombre: "Sucursal Central",
-            codigo: "SC001",
-          },
-          fecha_transaccion: "2025-01-28T16:45:00Z",
-          cajero: {
-            id: 3,
-            nombre_completo: "Cajero",
-          },
-        },
-      ]
-
-      const mockCuentas: Cuenta[] = [
-        {
-          id: 1,
-          numero_cuenta: "652732736823",
-          cliente: {
-            nombre_completo: "Cliente",
-            dui: "046765789",
-          },
-          tipo_cuenta: {
-            nombre: "Ahorros",
-          },
-          saldo: 1500.0,
-          estado: "activa",
-          fecha_apertura: "2024-01-10",
-          sucursal: {
-            nombre: "Sucursal Central",
-          },
-        },
-        {
-          id: 2,
-          numero_cuenta: "57687676666",
-          cliente: {
-            nombre_completo: "Cliente",
-            dui: "046765789",
-          },
-          tipo_cuenta: {
-            nombre: "Corriente",
-          },
-          saldo: 3000.0,
-          estado: "activa",
-          fecha_apertura: "2024-03-15",
-          sucursal: {
-            nombre: "Sucursal Central",
-          },
-        },
-        {
-          id: 3,
-          numero_cuenta: "1049170690",
-          cliente: {
-            nombre_completo: "Cliente",
-            dui: "046765789",
-          },
-          tipo_cuenta: {
-            nombre: "Ahorros",
-          },
-          saldo: 500.0,
-          estado: "activa",
-          fecha_apertura: "2025-05-28",
-          sucursal: {
-            nombre: "Sucursal Central",
-          },
-        },
-      ]
-
-      setTransacciones(mockTransacciones)
-      setCuentas(mockCuentas)
+      setUserRole(role)
+      
+      // Si hay token, cargamos los datos
+      cargarDatos()
     } catch (error) {
-      console.error("Error al cargar datos:", error)
-      setTransacciones([])
-      setCuentas([])
+      console.error("Error al acceder a localStorage:", error)
+      router.push("/login")
+    }
+  }, [])
+
+  const cargarDatos = async () => {
+    setIsLoading(true)
+    setError("")
+    
+    try {
+      // Cargamos todas las transacciones
+      const transaccionesResponse = await transaccionesAPI.getAll()
+      if (transaccionesResponse.error) {
+        throw new Error(transaccionesResponse.message || "Error al cargar transacciones")
+      }
+      
+      // Cargamos los tipos de transacciones
+      const tiposResponse = await tiposTransaccionAPI.getAll()
+      if (tiposResponse.error) {
+        throw new Error(tiposResponse.message || "Error al cargar tipos de transacciones")
+      }
+      
+      // Cargamos las cuentas
+      const cuentasResponse = await cuentasAPI.getAll()
+      if (cuentasResponse.error) {
+        throw new Error(cuentasResponse.message || "Error al cargar cuentas")
+      }
+      
+      // Cargamos usuarios cajeros
+      const cajerosResponse = await usuariosAPI.getByRol("cajero")
+      if (cajerosResponse.error) {
+        throw new Error(cajerosResponse.message || "Error al cargar usuarios cajeros")
+      }
+      
+      // Cargamos sucursales
+      const sucursalesResponse = await sucursalesAPI.getAll()
+      if (sucursalesResponse.error) {
+        throw new Error(sucursalesResponse.message || "Error al cargar sucursales")
+      }
+      
+      // Actualizamos el estado
+      setTransacciones(Array.isArray(transaccionesResponse) ? transaccionesResponse : [])
+      setTiposTransacciones(Array.isArray(tiposResponse) ? tiposResponse : [])
+      setCuentas(Array.isArray(cuentasResponse) ? cuentasResponse : [])
+      setUsuarios(Array.isArray(cajerosResponse) ? cajerosResponse : [])
+      setSucursales(Array.isArray(sucursalesResponse) ? sucursalesResponse : [])
+      
+    } catch (err: any) {
+      console.error("Error al cargar datos:", err)
+      setError(err.message || "Ocurrió un error al cargar los datos.")
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-SV", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(amount)
+  
+  const handleFiltroChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFiltros(prevFiltros => ({
+      ...prevFiltros,
+      [name]: value
+    }))
   }
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString("es-SV", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+    const aplicarFiltros = () => {
+    if (!transacciones.length) return []
+    
+    return transacciones.filter(transaccion => {
+      // Filtro por tipo de transacción
+      if (filtros.tipoTransaccion && transaccion.tipoTransaccion && 
+          transaccion.tipoTransaccion.id.toString() !== filtros.tipoTransaccion) {
+        return false
+      }
+      
+      // Filtro por sucursal
+      if (filtros.sucursal && transaccion.sucursal && 
+          transaccion.sucursal.id.toString() !== filtros.sucursal) {
+        return false
+      }
+      
+      // Filtro por fecha inicio
+      if (filtros.fechaInicio && transaccion.fecha && 
+          new Date(transaccion.fecha) < new Date(filtros.fechaInicio)) {
+        return false
+      }
+      
+      // Filtro por fecha fin
+      if (filtros.fechaFin && transaccion.fecha && 
+          new Date(transaccion.fecha) > new Date(filtros.fechaFin)) {
+        return false
+      }
+      
+      // Filtro por número de cuenta (origen o destino)
+      if (filtros.numeroCuenta) {
+        const cuentaOrigenMatch = transaccion.cuentaOrigen && transaccion.cuentaOrigen.numeroCuenta && 
+                                 transaccion.cuentaOrigen.numeroCuenta.includes(filtros.numeroCuenta)
+        const cuentaDestinoMatch = transaccion.cuentaDestino && transaccion.cuentaDestino.numeroCuenta && 
+                                  transaccion.cuentaDestino.numeroCuenta.includes(filtros.numeroCuenta)
+        if (!cuentaOrigenMatch && !cuentaDestinoMatch) {
+          return false
+        }
+      }
+      
+      // Filtro por cajero
+      if (filtros.usuario && transaccion.cajero && 
+          transaccion.cajero.id && transaccion.cajero.id.toString() !== filtros.usuario) {
+        return false
+      }
+      
+      return true
+    })
+  }
+  
+  const transaccionesFiltradas = aplicarFiltros()
+  
+  const resetFiltros = () => {
+    setFiltros({
+      tipoTransaccion: "",
+      sucursal: "",
+      fechaInicio: "",
+      fechaFin: "",
+      numeroCuenta: "",
+      usuario: ""
     })
   }
 
-  const filteredTransacciones = transacciones.filter((transaccion) => {
-    const fechaMatch = !filtroFecha || transaccion.fecha_transaccion.includes(filtroFecha)
-    const tipoMatch =
-      !filtroTipo || transaccion.tipo_transaccion.nombre.toLowerCase().includes(filtroTipo.toLowerCase())
-    const montoMatch = !filtroMonto || transaccion.monto >= Number.parseFloat(filtroMonto)
-
-    return fechaMatch && tipoMatch && montoMatch
-  })
-
-  const totalTransacciones = filteredTransacciones.length
-  const totalMonto = filteredTransacciones.reduce((sum, t) => sum + t.monto, 0)
-  const totalCuentas = cuentas.length
-  const totalSaldos = cuentas.reduce((sum, c) => sum + c.saldo, 0)
-
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
+  
   const handleLogout = () => {
     localStorage.removeItem("authToken")
     localStorage.removeItem("userRole")
@@ -325,398 +246,282 @@ export default function MovimientosPage() {
     localStorage.removeItem("userId")
     router.push("/login")
   }
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible)
+    const formatoFecha = (fechaString: string) => {
+    if (!fechaString) return '-'
+    try {
+      const fecha = new Date(fechaString)
+      return fecha.toLocaleString('es-ES', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (error) {
+      console.error("Error al formatear fecha:", error)
+      return fechaString
+    }
   }
-
+    const formatoMoneda = (monto: number) => {
+    if (monto === undefined || monto === null) return '-'
+    try {
+      return new Intl.NumberFormat('es-SV', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(monto)
+    } catch (error) {
+      console.error("Error al formatear monto:", error)
+      return `$${monto}`
+    }
+  }
+  
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-green-600 text-white p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full"
-            title="Volver atrás"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <img src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="h-12 mr-4" />
-          <h1 className="text-xl font-bold text-green-700">Movimientos y Cuentas</h1>
+          <Image 
+            src="/imagenes/logo-login.png" 
+            alt="AgroBanco Salvadoreño" 
+            width={40} 
+            height={40} 
+            className="mr-3" 
+          />
+          <h1 className="text-xl font-bold">Movimientos Bancarios</h1>
         </div>
-        <div className="relative">
-          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200" onClick={toggleMenu}>
-            <img src="/imagenes/Usuario.png" alt="Usuario" className="w-8 h-8 rounded-full" />
-          </button>
 
-          {menuVisible && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-              <Link href="/perfil-gerente" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Perfil
-              </Link>
-              <Link href="/configuracion-gerente" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Configuración
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
-          )}
+        <div className="flex items-center">
+          <button 
+            onClick={() => router.back()} 
+            className="mr-4 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md"
+          >
+            Volver
+          </button>
+          
+          <div className="relative">
+            <button 
+              onClick={toggleMenu}
+              className="p-2 hover:bg-green-700 rounded-full"
+              title="Menú de usuario"
+              aria-label="Abrir menú de usuario"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </button>
+
+            {menuVisible && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Estadísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-blue-100 text-blue-600">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Transacciones</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalTransacciones}</p>
-                </div>
-              </div>
-            </div>
+      <main className="flex-1 p-6">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+            <strong className="font-bold">Error:</strong>
+            <span className="block sm:inline"> {error}</span>
+          </div>
+        )}
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-green-100 text-green-600">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Monto Total</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalMonto)}</p>
-                </div>
-              </div>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">Filtros de búsqueda</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Transacción</label>              <select 
+                name="tipoTransaccion"
+                value={filtros.tipoTransaccion}
+                onChange={handleFiltroChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                aria-label="Filtrar por tipo de transacción"
+                title="Tipo de transacción"
+              >
+                <option value="">Todos</option>
+                {tiposTransacciones.map(tipo => (
+                  <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+                ))}
+              </select>
             </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Cuentas</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalCuentas}</p>
-                </div>
-              </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>              <select 
+                name="sucursal"
+                value={filtros.sucursal}
+                onChange={handleFiltroChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                aria-label="Filtrar por sucursal"
+                title="Sucursal"
+              >
+                <option value="">Todas</option>
+                {sucursales.map(sucursal => (
+                  <option key={sucursal.id} value={sucursal.id}>{sucursal.nombre}</option>
+                ))}
+              </select>
             </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Saldos Totales</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalSaldos)}</p>
-                </div>
-              </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cajero</label>              <select 
+                name="usuario"
+                value={filtros.usuario}
+                onChange={handleFiltroChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                aria-label="Filtrar por cajero"
+                title="Cajero"
+              >
+                <option value="">Todos</option>
+                {usuarios.map(usuario => (
+                  <option key={usuario.id} value={usuario.id}>{usuario.nombreCompleto}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número de Cuenta</label>              <input 
+                type="text" 
+                name="numeroCuenta"
+                value={filtros.numeroCuenta}
+                onChange={handleFiltroChange}
+                placeholder="Buscar por número de cuenta"
+                aria-label="Buscar por número de cuenta"
+                title="Número de cuenta"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>              <input 
+                type="date" 
+                name="fechaInicio"
+                value={filtros.fechaInicio}
+                onChange={handleFiltroChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                aria-label="Fecha inicial para filtrar transacciones"
+                title="Fecha desde"
+                placeholder="Seleccione fecha inicial"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>              <input 
+                type="date" 
+                name="fechaFin"
+                value={filtros.fechaFin}
+                onChange={handleFiltroChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                aria-label="Fecha final para filtrar transacciones"
+                title="Fecha hasta"
+                placeholder="Seleccione fecha final"
+              />
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="bg-white rounded-lg shadow-md mb-6">
-            <div className="border-b">
-              <nav className="flex">
-                <button
-                  onClick={() => setActiveTab("transacciones")}
-                  className={`px-6 py-3 font-medium text-sm ${
-                    activeTab === "transacciones"
-                      ? "border-b-2 border-green-500 text-green-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Transacciones
-                </button>
-                <button
-                  onClick={() => setActiveTab("cuentas")}
-                  className={`px-6 py-3 font-medium text-sm ${
-                    activeTab === "cuentas"
-                      ? "border-b-2 border-green-500 text-green-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Estado de Cuentas
-                </button>
-              </nav>
-            </div>
-
-            <div className="p-6">
-              {activeTab === "transacciones" && (
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                      <img src="/imagenes/movimiento.png" alt="Movimientos" className="w-16 h-16 mr-4" />
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-800">Historial de Transacciones</h2>
-                        <p className="text-gray-600">Revisa todas las transacciones realizadas</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={loadData}
-                      disabled={loading}
-                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <span className="animate-spin">⟳</span>
-                          Cargando...
-                        </>
-                      ) : (
-                        <>🔄 Actualizar</>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Filtros */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por fecha</label>
-                      <input
-                        type="date"
-                        value={filtroFecha}
-                        onChange={(e) => setFiltroFecha(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por tipo</label>
-                      <input
-                        type="text"
-                        value={filtroTipo}
-                        onChange={(e) => setFiltroTipo(e.target.value)}
-                        placeholder="Depósito, Retiro, Transferencia..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Monto mínimo</label>
-                      <input
-                        type="number"
-                        value={filtroMonto}
-                        onChange={(e) => setFiltroMonto(e.target.value)}
-                        placeholder="0.00"
-                        step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  </div>
-
-                  {loading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin text-4xl mb-4">⟳</div>
-                      <p className="text-gray-500">Cargando transacciones...</p>
-                    </div>
-                  ) : filteredTransacciones.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="text-6xl mb-4">💳</div>
-                      <p className="text-gray-500 mb-4">No se encontraron transacciones.</p>
-                      <p className="text-sm text-gray-400">
-                        {transacciones.length === 0
-                          ? "No hay transacciones registradas en el sistema."
-                          : "Intente ajustar los filtros de búsqueda."}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full bg-white border border-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Número
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tipo
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Cliente
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Cuenta
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Monto
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Comisión
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Fecha
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Estado
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {filteredTransacciones.map((transaccion) => (
-                            <tr key={transaccion.id}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {transaccion.numero_transaccion}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span
-                                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                    transaccion.tipo_transaccion.nombre === "Depósito"
-                                      ? "bg-green-100 text-green-800"
-                                      : transaccion.tipo_transaccion.nombre === "Retiro"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-blue-100 text-blue-800"
-                                  }`}
-                                >
-                                  {transaccion.tipo_transaccion.nombre}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div>
-                                  <div className="font-medium">{transaccion.cuenta_origen.cliente.nombre_completo}</div>
-                                  <div className="text-gray-500">{transaccion.cuenta_origen.cliente.dui}</div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div>
-                                  <div className="font-medium">{transaccion.cuenta_origen.numero_cuenta}</div>
-                                  <div className="text-gray-500">{transaccion.cuenta_origen.tipo_cuenta.nombre}</div>
-                                </div>
-                                {transaccion.cuenta_destino && (
-                                  <div className="text-gray-500 text-xs mt-1">
-                                    → {transaccion.cuenta_destino.numero_cuenta}
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {formatCurrency(transaccion.monto)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {formatCurrency(transaccion.comision)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {formatDateTime(transaccion.fecha_transaccion)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                  {transaccion.estado}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "cuentas" && (
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                      <img src="/imagenes/movimiento.png" alt="Cuentas" className="w-16 h-16 mr-4" />
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-800">Estado de Cuentas</h2>
-                        <p className="text-gray-600">Resumen de todas las cuentas activas</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {loading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin text-4xl mb-4">⟳</div>
-                      <p className="text-gray-500">Cargando cuentas...</p>
-                    </div>
-                  ) : cuentas.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="text-6xl mb-4">🏦</div>
-                      <p className="text-gray-500 mb-4">No se encontraron cuentas.</p>
-                      <p className="text-sm text-gray-400">No hay cuentas registradas en el sistema.</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {cuentas.map((cuenta) => (
-                        <div key={cuenta.id} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <h3 className="font-bold text-lg text-green-700">{cuenta.numero_cuenta}</h3>
-                              <p className="text-sm text-gray-600">{cuenta.tipo_cuenta.nombre}</p>
-                            </div>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                cuenta.estado === "activa" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {cuenta.estado}
-                            </span>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm font-semibold">Cliente:</p>
-                              <p className="text-sm text-gray-700">{cuenta.cliente.nombre_completo}</p>
-                              <p className="text-xs text-gray-500">{cuenta.cliente.dui}</p>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-semibold">Saldo Actual:</p>
-                              <p className="text-xl font-bold text-green-600">{formatCurrency(cuenta.saldo)}</p>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-semibold">Fecha de Apertura:</p>
-                              <p className="text-sm text-gray-700">
-                                {new Date(cuenta.fecha_apertura).toLocaleDateString("es-SV")}
-                              </p>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-semibold">Sucursal:</p>
-                              <p className="text-sm text-gray-700">{cuenta.sucursal.nombre}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className="flex justify-end">
+            <button
+              onClick={resetFiltros}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none mr-4"
+            >
+              Restablecer
+            </button>
           </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">Historial de Movimientos</h2>
+            <span className="text-sm text-gray-600">
+              Total: {transaccionesFiltradas?.length || 0} movimientos
+            </span>
+          </div>
+          
+          {isLoading ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            </div>
+          ) : transaccionesFiltradas && transaccionesFiltradas.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nº Transacción
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Monto
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cuenta Origen
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cuenta Destino
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sucursal
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cajero
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Descripción
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {transaccionesFiltradas.map((transaccion) => (
+                    <tr key={transaccion.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {transaccion.numeroTransaccion}
+                      </td>                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {transaccion.tipoTransaccion?.nombre || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatoFecha(transaccion.fecha)}
+                      </td>                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
+                        transaccion.tipoTransaccion?.nombre?.toLowerCase() === 'retiro' ? 'text-red-500' : 
+                        transaccion.tipoTransaccion?.nombre?.toLowerCase() === 'depósito' || 
+                        transaccion.tipoTransaccion?.nombre?.toLowerCase() === 'deposito' ? 'text-green-600' : 
+                        'text-gray-900'
+                      }`}>
+                        {formatoMoneda(transaccion.monto)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {transaccion.cuentaOrigen?.numeroCuenta || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {transaccion.cuentaDestino?.numeroCuenta || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {transaccion.sucursal?.nombre || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {transaccion.cajero?.nombreCompleto || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-normal text-sm text-gray-500">
+                        {transaccion.descripcion}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="py-8 text-center text-gray-500">
+              No se encontraron movimientos con los filtros aplicados.
+            </div>
+          )}
         </div>
       </main>
     </div>

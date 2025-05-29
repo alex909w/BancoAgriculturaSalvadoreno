@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function ConfiguracionCajero() {
   const router = useRouter()
+  const [menuVisible, setMenuVisible] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState({
     notificaciones: {
       email: true,
@@ -29,6 +32,49 @@ export default function ConfiguracionCajero() {
       alertaMonto: "5000"
     }
   })
+
+  useEffect(() => {
+    // Verificar autenticación
+    const token = localStorage.getItem("authToken")
+    const userRole = localStorage.getItem("userRole")
+
+    if (!token || !userRole) {
+      router.push("/login")
+      return
+    }
+
+    if (userRole !== "cajero") {
+      router.push("/login")
+      return
+    }
+
+    loadConfiguration()
+  }, [router])
+
+  const loadConfiguration = async () => {
+    try {
+      setLoading(true)
+      // Intentar cargar configuración desde la API
+      // await apiRequest("/configuracion/cajero")
+      console.log("Configuración cargada")
+    } catch (error) {
+      console.error("Error al cargar configuración:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken")
+    localStorage.removeItem("userRole")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userId")
+    router.push("/login")
+  }
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible)
+  }
   const handleToggle = (category: string, setting: string) => {
     setSettings(prev => {
       const categoryObj = prev[category as keyof typeof prev] as Record<string, any>
@@ -89,22 +135,70 @@ export default function ConfiguracionCajero() {
       alert("Configuración restablecida a valores predeterminados")
     }
   }
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando configuración...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-md p-4 flex items-center">        <button 
-          onClick={() => router.back()} 
-          className="mr-4 p-2 hover:bg-gray-100 rounded-full"
-          title="Volver atrás"
-          aria-label="Volver a la página anterior"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+      <header className="bg-green-600 text-white p-4 flex items-center justify-between">
         <div className="flex items-center">
-          <img src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="h-12 mr-4" />
-          <h1 className="text-xl font-bold text-green-700">Configuración</h1>
+          <button 
+            onClick={() => router.back()} 
+            className="mr-4 p-2 hover:bg-green-700 rounded-full"
+            title="Volver atrás"
+            aria-label="Volver a la página anterior"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <Image src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño" width={40} height={40} className="mr-3" />
+          <h1 className="text-xl font-bold">Configuración - Cajero</h1>
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={toggleMenu}
+            className="p-2 hover:bg-green-700 rounded-full"
+            title="Menú de usuario"
+            aria-label="Abrir menú de usuario"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+
+          {menuVisible && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+              <button
+                onClick={() => router.push("/dashboard-cajero")}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => router.push("/perfil-cajero")}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Mi Perfil
+              </button>
+              <hr className="my-1" />
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

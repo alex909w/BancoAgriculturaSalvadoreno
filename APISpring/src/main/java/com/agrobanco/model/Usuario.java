@@ -30,7 +30,7 @@ public class Usuario {
     private String email;
     
     @NotBlank(message = "La contraseña es requerida")
-    @JsonIgnore
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
     

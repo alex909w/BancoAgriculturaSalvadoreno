@@ -2,47 +2,53 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
+import Image from "next/image"
 
-interface Prestamo {
-  id: number
-  numero_prestamo: string
-  cliente: {
-    id: number
-    nombre_completo: string
-    dui: string
-    email: string
-    telefono: string
-  }
-  tipo_prestamo: {
-    id: number
-    nombre: string
-    descripcion: string
-    tasa_interes: number
-    requiere_garantia: boolean
-    monto_minimo: number
-    monto_maximo: number
-  }
-  monto_solicitado: number
-  monto_aprobado?: number
-  plazo_meses: number
-  estado: string
-  fecha_solicitud: string
-  observaciones?: string
-  cuenta_vinculada_id: number
+interface Solicitud {
+  id: string
+  cliente: string
+  dui: string
+  tipo: "prestamo" | "cuenta" | "tarjeta"
+  monto?: string
+  estado: "pendiente" | "aprobada" | "rechazada"
+  fecha: string
+  descripcion: string
 }
 
-export default function SolicitudesPrestamos() {
+export default function Solicitudes() {
   const router = useRouter()
-  const [prestamos, setPrestamos] = useState<Prestamo[]>([])
-  const [loading, setLoading] = useState(true)
   const [menuVisible, setMenuVisible] = useState(false)
-  const [selectedPrestamo, setSelectedPrestamo] = useState<Prestamo | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState<"aprobar" | "rechazar">("aprobar")
-  const [montoAprobado, setMontoAprobado] = useState("")
-  const [observaciones, setObservaciones] = useState("")
-  const [processing, setProcessing] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([
+    {
+      id: "SOL001",
+      cliente: "María González",
+      dui: "12345678-9",
+      tipo: "prestamo",
+      monto: "$15,000",
+      estado: "pendiente",
+      fecha: "2024-01-15",
+      descripcion: "Préstamo para inversión agrícola"
+    },
+    {
+      id: "SOL002",
+      cliente: "Carlos Martínez",
+      dui: "98765432-1",
+      tipo: "cuenta",
+      estado: "pendiente",
+      fecha: "2024-01-14",
+      descripcion: "Apertura de cuenta de ahorros"
+    },
+    {
+      id: "SOL003",
+      cliente: "Ana López",
+      dui: "11223344-5",
+      tipo: "tarjeta",
+      estado: "aprobada",
+      fecha: "2024-01-13",
+      descripcion: "Solicitud de tarjeta de débito"
+    }
+  ])
 
   useEffect(() => {
     // Verificar autenticación
@@ -54,95 +60,13 @@ export default function SolicitudesPrestamos() {
       return
     }
 
-    if (userRole !== "gerente") {
+    if (userRole !== "gerente" && userRole !== "admin") {
       router.push("/login")
       return
     }
 
-    loadSolicitudes()
+    setLoading(false)
   }, [router])
-
-  const loadSolicitudes = async () => {
-    try {
-      setLoading(true)
-      console.log("Cargando solicitudes de préstamos...")
-
-      // Simular datos basados en la estructura real de la BD
-      const mockPrestamos: Prestamo[] = [
-        {
-          id: 2,
-          numero_prestamo: "PRE-002",
-          cliente: {
-            id: 2,
-            nombre_completo: "Cliente",
-            dui: "046765789",
-            email: "cliente@gmail.com",
-            telefono: "78573605",
-          },
-          tipo_prestamo: {
-            id: 1,
-            nombre: "Personal",
-            descripcion: "Préstamo personal sin garantía",
-            tasa_interes: 0.12,
-            requiere_garantia: false,
-            monto_minimo: 500.0,
-            monto_maximo: 10000.0,
-          },
-          monto_solicitado: 5000.0,
-          plazo_meses: 24,
-          estado: "solicitado",
-          fecha_solicitud: "2025-01-28",
-          cuenta_vinculada_id: 1,
-        },
-        {
-          id: 3,
-          numero_prestamo: "PRE-003",
-          cliente: {
-            id: 2,
-            nombre_completo: "Cliente",
-            dui: "046765789",
-            email: "cliente@gmail.com",
-            telefono: "78573605",
-          },
-          tipo_prestamo: {
-            id: 4,
-            nombre: "Agrícola",
-            descripcion: "Préstamo para actividades agrícolas",
-            tasa_interes: 0.09,
-            requiere_garantia: false,
-            monto_minimo: 1000.0,
-            monto_maximo: 25000.0,
-          },
-          monto_solicitado: 15000.0,
-          plazo_meses: 36,
-          estado: "en_revision",
-          fecha_solicitud: "2025-01-25",
-          cuenta_vinculada_id: 2,
-        },
-      ]
-
-      setPrestamos(mockPrestamos)
-    } catch (error) {
-      console.error("Error al cargar solicitudes:", error)
-      setPrestamos([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-SV", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  const calcularCuotaMensual = (monto: number, tasa: number, meses: number) => {
-    const tasaMensual = tasa / 12
-    const cuota = (monto * tasaMensual * Math.pow(1 + tasaMensual, meses)) / (Math.pow(1 + tasaMensual, meses) - 1)
-    return cuota
-  }
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
@@ -156,95 +80,99 @@ export default function SolicitudesPrestamos() {
     setMenuVisible(!menuVisible)
   }
 
-  const handleAprobar = (prestamo: Prestamo) => {
-    setSelectedPrestamo(prestamo)
-    setModalType("aprobar")
-    setMontoAprobado(prestamo.monto_solicitado.toString())
-    setObservaciones("")
-    setShowModal(true)
+  const handleApprove = (id: string) => {
+    setSolicitudes(prev => prev.map(solicitud => 
+      solicitud.id === id ? { ...solicitud, estado: "aprobada" as const } : solicitud
+    ))
+    alert("Solicitud aprobada exitosamente")
   }
 
-  const handleRechazar = (prestamo: Prestamo) => {
-    setSelectedPrestamo(prestamo)
-    setModalType("rechazar")
-    setObservaciones("")
-    setShowModal(true)
+  const handleReject = (id: string) => {
+    setSolicitudes(prev => prev.map(solicitud => 
+      solicitud.id === id ? { ...solicitud, estado: "rechazada" as const } : solicitud
+    ))
+    alert("Solicitud rechazada")
   }
 
-  const procesarSolicitud = async () => {
-    if (!selectedPrestamo) return
-
-    setProcessing(true)
-
-    try {
-      if (modalType === "aprobar") {
-        const monto = Number.parseFloat(montoAprobado)
-        if (isNaN(monto) || monto <= 0 || monto > selectedPrestamo.monto_solicitado) {
-          alert("Monto inválido")
-          return
-        }
-
-        // Simular aprobación
-        console.log("Aprobando préstamo:", {
-          id: selectedPrestamo.id,
-          montoAprobado: monto,
-          gerenteId: 4, // ID del gerente en la BD
-          observaciones,
-        })
-
-        alert("Préstamo aprobado con éxito")
-        loadSolicitudes()
-      } else if (modalType === "rechazar") {
-        // Simular rechazo
-        console.log("Rechazando préstamo:", {
-          id: selectedPrestamo.id,
-          observaciones,
-        })
-
-        alert("Préstamo rechazado con éxito")
-        loadSolicitudes()
-      }
-    } catch (error) {
-      console.error("Error al procesar la solicitud:", error)
-      alert("Error al procesar la solicitud")
-    } finally {
-      setProcessing(false)
-      setShowModal(false)
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case "pendiente":
+        return "bg-yellow-100 text-yellow-800"
+      case "aprobada":
+        return "bg-green-100 text-green-800"
+      case "rechazada":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
+  }
+
+  const getTipoIcon = (tipo: string) => {
+    switch (tipo) {
+      case "prestamo":
+        return "💰"
+      case "cuenta":
+        return "🏦"
+      case "tarjeta":
+        return "💳"
+      default:
+        return "📄"
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando solicitudes...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
+      <header className="bg-green-600 text-white p-4 flex items-center justify-between">
         <div className="flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full"
+          <button 
+            onClick={() => router.back()} 
+            className="mr-4 p-2 hover:bg-green-700 rounded-full"
             title="Volver atrás"
+            aria-label="Volver a la página anterior"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <img src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño Logo" className="h-12 mr-4" />
-          <h1 className="text-xl font-bold text-green-700">Solicitudes de Préstamos</h1>
+          <Image src="/imagenes/logo-login.png" alt="AgroBanco Salvadoreño" width={40} height={40} className="mr-3" />
+          <h1 className="text-xl font-bold">Gestión de Solicitudes</h1>
         </div>
+
         <div className="relative">
-          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200" onClick={toggleMenu}>
-            <img src="/imagenes/Usuario.png" alt="Usuario" className="w-8 h-8 rounded-full" />
+          <button
+            onClick={toggleMenu}
+            className="p-2 hover:bg-green-700 rounded-full"
+            title="Menú de usuario"
+            aria-label="Abrir menú de usuario"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </button>
 
           {menuVisible && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-              <Link href="/perfil-gerente" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Perfil
-              </Link>
-              <Link href="/configuracion-gerente" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Configuración
-              </Link>
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+              <button
+                onClick={() => router.push("/dashboard-gerente")}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Dashboard
+              </button>
+              <hr className="my-1" />
               <button
                 onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               >
                 Cerrar Sesión
               </button>
@@ -254,264 +182,160 @@ export default function SolicitudesPrestamos() {
       </header>
 
       <main className="p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
-                <img src="/imagenes/solicitud.png" alt="Solicitudes" className="w-16 h-16 mr-4" />
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Solicitudes Pendientes</h2>
-                  <p className="text-gray-600">Revisa y procesa las solicitudes de préstamos</p>
-                </div>
+            <div className="flex items-center mb-4">
+              <Image src="/imagenes/solicitud.png" alt="Solicitudes" width={64} height={64} className="mr-4" />
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">Solicitudes Pendientes</h2>
+                <p className="text-gray-600">Gestiona las solicitudes de clientes</p>
               </div>
-              <button
-                onClick={loadSolicitudes}
-                disabled={loading}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <span className="animate-spin">⟳</span>
-                    Cargando...
-                  </>
-                ) : (
-                  <>🔄 Actualizar</>
-                )}
-              </button>
             </div>
 
-            {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin text-4xl mb-4">⟳</div>
-                <p className="text-gray-500">Cargando solicitudes...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <div className="flex items-center">
+                  <div className="bg-yellow-500 p-2 rounded-full mr-3">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-yellow-800">
+                      {solicitudes.filter(s => s.estado === "pendiente").length}
+                    </p>
+                    <p className="text-yellow-600">Pendientes</p>
+                  </div>
+                </div>
               </div>
-            ) : prestamos.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-6xl mb-4">📋</div>
-                <p className="text-gray-500 mb-4">No hay solicitudes pendientes en este momento.</p>
-                <p className="text-sm text-gray-400">Las nuevas solicitudes aparecerán aquí automáticamente.</p>
+
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center">
+                  <div className="bg-green-500 p-2 rounded-full mr-3">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-green-800">
+                      {solicitudes.filter(s => s.estado === "aprobada").length}
+                    </p>
+                    <p className="text-green-600">Aprobadas</p>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-6">
-                {prestamos.map((prestamo) => {
-                  const cuotaMensual = calcularCuotaMensual(
-                    prestamo.monto_solicitado,
-                    prestamo.tipo_prestamo.tasa_interes,
-                    prestamo.plazo_meses,
-                  )
 
-                  return (
-                    <div key={prestamo.id} className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Información del Cliente */}
-                        <div className="space-y-3">
-                          <h3 className="font-bold text-lg text-green-700">Información del Cliente</h3>
-                          <div className="space-y-2 text-sm">
-                            <p>
-                              <span className="font-semibold">Nombre:</span> {prestamo.cliente.nombre_completo}
-                            </p>
-                            <p>
-                              <span className="font-semibold">DUI:</span> {prestamo.cliente.dui}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Email:</span> {prestamo.cliente.email}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Teléfono:</span> {prestamo.cliente.telefono}
-                            </p>
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="flex items-center">
+                  <div className="bg-red-500 p-2 rounded-full mr-3">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-red-800">
+                      {solicitudes.filter(s => s.estado === "rechazada").length}
+                    </p>
+                    <p className="text-red-600">Rechazadas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-bold text-gray-800">Lista de Solicitudes</h3>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Solicitud
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cliente
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Monto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {solicitudes.map((solicitud) => (
+                    <tr key={solicitud.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <span className="text-2xl mr-3">{getTipoIcon(solicitud.tipo)}</span>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{solicitud.id}</div>
+                            <div className="text-sm text-gray-500">{solicitud.descripcion}</div>
                           </div>
                         </div>
-
-                        {/* Información del Préstamo */}
-                        <div className="space-y-3">
-                          <h3 className="font-bold text-lg text-green-700">Detalles del Préstamo</h3>
-                          <div className="space-y-2 text-sm">
-                            <p>
-                              <span className="font-semibold">Número:</span> {prestamo.numero_prestamo}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Tipo:</span> {prestamo.tipo_prestamo.nombre}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Monto:</span>{" "}
-                              <span className="text-lg font-bold text-green-600">
-                                {formatCurrency(prestamo.monto_solicitado)}
-                              </span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">Plazo:</span> {prestamo.plazo_meses} meses
-                            </p>
-                            <p>
-                              <span className="font-semibold">Tasa:</span>{" "}
-                              {(prestamo.tipo_prestamo.tasa_interes * 100).toFixed(2)}%
-                            </p>
-                            <p>
-                              <span className="font-semibold">Fecha:</span>{" "}
-                              {new Date(prestamo.fecha_solicitud).toLocaleDateString("es-SV")}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Análisis Financiero */}
-                        <div className="space-y-3">
-                          <h3 className="font-bold text-lg text-green-700">Análisis del Préstamo</h3>
-                          <div className="space-y-2 text-sm">
-                            <p>
-                              <span className="font-semibold">Cuota Mensual:</span>{" "}
-                              <span className="text-lg font-bold text-blue-600">{formatCurrency(cuotaMensual)}</span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">Rango Permitido:</span>{" "}
-                              {formatCurrency(prestamo.tipo_prestamo.monto_minimo)} -{" "}
-                              {formatCurrency(prestamo.tipo_prestamo.monto_maximo)}
-                            </p>
-                            <p>
-                              <span className="font-semibold">Garantía:</span>
-                              <span
-                                className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
-                                  prestamo.tipo_prestamo.requiere_garantia
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {prestamo.tipo_prestamo.requiere_garantia ? "Requerida" : "No requerida"}
-                              </span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">Estado:</span>
-                              <span
-                                className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
-                                  prestamo.estado === "solicitado"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-orange-100 text-orange-800"
-                                }`}
-                              >
-                                {prestamo.estado === "solicitado" ? "Nuevo" : "En Revisión"}
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Descripción del Tipo de Préstamo */}
-                      <div className="mt-4 space-y-2">
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <span className="font-semibold">Descripción:</span>
-                          <p className="text-sm text-gray-700 mt-1">{prestamo.tipo_prestamo.descripcion}</p>
+                          <div className="text-sm font-medium text-gray-900">{solicitud.cliente}</div>
+                          <div className="text-sm text-gray-500">{solicitud.dui}</div>
                         </div>
-                        <div>
-                          <span className="font-semibold">Cuenta Vinculada:</span>
-                          <p className="text-sm text-gray-700 mt-1">ID: {prestamo.cuenta_vinculada_id}</p>
-                        </div>
-                      </div>
-
-                      {/* Acciones */}
-                      <div className="mt-6 flex justify-end space-x-4">
-                        <button
-                          onClick={() => handleRechazar(prestamo)}
-                          className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                        >
-                          Rechazar
-                        </button>
-                        <button
-                          onClick={() => handleAprobar(prestamo)}
-                          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                        >
-                          Aprobar
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="capitalize text-sm text-gray-900">{solicitud.tipo}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {solicitud.monto || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getEstadoColor(solicitud.estado)}`}>
+                          {solicitud.estado}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(solicitud.fecha).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {solicitud.estado === "pendiente" && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleApprove(solicitud.id)}
+                              className="text-green-600 hover:text-green-900 px-3 py-1 bg-green-100 rounded-md"
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              onClick={() => handleReject(solicitud.id)}
+                              className="text-red-600 hover:text-red-900 px-3 py-1 bg-red-100 rounded-md"
+                            >
+                              Rechazar
+                            </button>
+                          </div>
+                        )}
+                        {solicitud.estado !== "pendiente" && (
+                          <span className="text-gray-400">Procesada</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>
-
-      {/* Modal para aprobar/rechazar */}
-      {showModal && selectedPrestamo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-bold mb-4">
-              {modalType === "aprobar" ? "Aprobar Préstamo" : "Rechazar Préstamo"}
-            </h3>
-
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Cliente:</span> {selectedPrestamo.cliente.nombre_completo}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Monto solicitado:</span>{" "}
-                {formatCurrency(selectedPrestamo.monto_solicitado)}
-              </p>
-            </div>
-
-            {modalType === "aprobar" ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Monto a aprobar (USD) *</label>
-                  <input
-                    type="number"
-                    value={montoAprobado}
-                    onChange={(e) => setMontoAprobado(e.target.value)}
-                    step="0.01"
-                    min={selectedPrestamo.tipo_prestamo.monto_minimo}
-                    max={selectedPrestamo.monto_solicitado}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Observaciones (opcional)</label>
-                  <textarea
-                    value={observaciones}
-                    onChange={(e) => setObservaciones(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Comentarios adicionales..."
-                  />
-                </div>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Motivo del rechazo *</label>
-                <textarea
-                  value={observaciones}
-                  onChange={(e) => setObservaciones(e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Explique el motivo del rechazo..."
-                  required
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-4 mt-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                disabled={processing}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={procesarSolicitud}
-                disabled={
-                  processing ||
-                  (modalType === "aprobar" && !montoAprobado) ||
-                  (modalType === "rechazar" && !observaciones)
-                }
-                className={`px-4 py-2 rounded-md text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  modalType === "aprobar" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {processing ? "Procesando..." : modalType === "aprobar" ? "Aprobar" : "Rechazar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
